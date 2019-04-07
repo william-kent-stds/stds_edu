@@ -1,5 +1,6 @@
 #install.packages("wbstats")
 library(wbstats)
+library(tidyverse)
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 #getwd()
@@ -11,10 +12,10 @@ if (!dir.exists("../Data Files/World Bank")) {
 # Create cache for world bank data
 world_bank_cache <- wbcache()
 
-# Use wbsearch to find a data set using regular expressions - I think we need NY.GDP.PCAP.PP.CD
+# Use wbsearch to find a data set using regular expressions - I think we need NY.GDP.PCAP.CD
 #wbsearch("gdp.*capita", cache = world_bank_cache)
 
-gdp_data <- wb(indicator = "NY.GDP.PCAP.PP.CD")
+gdp_data <- wb(indicator = "NY.GDP.PCAP.CD")
 summary(gdp_data)
 head(gdp_data)
 
