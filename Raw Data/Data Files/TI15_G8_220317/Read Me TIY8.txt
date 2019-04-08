@@ -1,0 +1,290 @@
+TIMSS 2015 AUSTRALIAN YEAR 8 DATA
+
+The TIMSS data are complex and require particular procedures for merging, weighting etc. 
+Therefore, it is highly recommended that you obtain a copy of the supporting documentation for the International Database
+in order to get the most out of the data.  The supporting documentation is available at:
+http://timssandpirls.bc.edu/timss2015/international-database/
+
+The data contained in the files accompanying this file are the Australian data.  
+For the most part these data are the same as that contained in Australian files within the International Database. 
+However these data files also contain some extra national variables and, where applicable, national options for items have 
+been detailed in the variable and/or value labels.
+ 
+The information below details the national variables not available in the international versions of the Australian data, 
+but made available in these files, as well as those international items that have national options or country-specific terminology.
+
+PLEASE NOTE: For ease of use the following international terms have been modified to the Australian context wherever they occur:
+<LANGUAGE OF TEST> - ENGLISH
+<EIGHTH GRADE> - YEAR 8 
+
+
+****---BCGAUSM6: School backgroud data.
+
+NATIONAL ITEM 
+BCNG05A
+Question:
+A: How many people live in the city, town, or area where your school is located?
+1 = More than 500,000 people 
+2 = 100,001 to 500,000 people
+3 = 50,001 to 100,000 people 
+4 = 30,001 to 50,000 people  
+5 = 15,001 to 30,000 people  
+6 = 3,001 to 15,000 people   
+7 = 3,000 people or fewer 
+8 = Fewer than 1,000 people   
+
+INTERNATIONAL ITEM BASED ON A NATIONAL ITEM
+BCBG05A
+Question:
+A: How many people live in the city, town, or area where your school is located?
+1 = More than 500,000 people   
+2 = 100,001 to 500,000 people  
+3 = 50,001 to 100,000 people   
+4 = 30,001 to 50,000 people    
+5 = 15,001 to 30,000 people    
+6 = 3,001 to 15,000 people     
+7 = 3,000 people or fewer  
+  
+Variable Name	Documentation
+BCBG05A 	National options recoded (from BCNG05A) for international comparability:
+		1 = More than 500,000 people   
+		2 = 100,001 to 500,000 people  
+		3 = 50,001 to 100,000 people   
+		4 = 30,001 to 50,000 people    
+		5 = 15,001 to 30,000 people    
+		6 = 3,001 to 15,000 people     
+		7 = 1,001 to 3,000 people / Fewer than 1,000 people   
+
+
+NATIONAL ITEM 
+BCNG21
+Question:
+What is the highest level of formal education you have completed? 
+1 = A TAFE or  college diploma                     
+2 = An undergraduate or bachelor's degree   
+3 = A graduate or postgraduate diploma [NEW]
+4 = A master's degree                       
+5 = A PhD or doctorate
+
+INTERNATIONAL ITEM BASED ON A NATIONAL ITEM WITH NATIONAL TERMINOLOGY 
+BCBG21
+Question:
+What is the highest level of formal education you have completed?              
+1 = Did not complete <Bachelor's or equivalent level—ISCED Level 6>
+2 = <Bachelor's or equivalent level—ISCED Level 6>                 
+3 = <Master's or equivalent level—ISCED Level 7>                   
+4 = <Doctor or equivalent level—ISCED Level 8>              
+
+Variable Name	Documentation
+BCBG21 		National options recoded (from BCBG21) for international comparability:
+		1 = A TAFE or  college diploma                     
+		2 = An undergraduate or bachelor's degree / A graduate or postgraduate diploma 
+		3 = A master's degree 
+		4 = A PhD or doctorate                       
+    
+
+****----**** BSGAUSM6- Student Background data****.
+
+NATIONAL ITEMS
+STATE
+Applied from School Address
+1 = ACT
+2 = NSW
+3 = VIC
+4 = QLD
+5 = SA
+6 = WA
+7 = TAS
+8 = NT
+
+
+GEOLOC
+Geographic location of the school - Applied from School Address
+1 = Metropolitan
+2 = Provincial
+3 = Remote
+
+
+INDIG
+Indigenous Background - obtained from school records
+0=Not Indigenous
+1=Indigenous
+
+
+INTERNATIONAL ITEM WITH NATIONAL OPTIONS
+BSBG06A-K
+Question:
+Do you have any of these things at your home?
+A: A computer or tablet of your own
+B: A computer or tablet that is shared with other people at home
+C: Study desk/table for your use
+D: Your own room
+E: Internet connection
+F: Your own mobile phone
+G: A gaming system ((e.g., PlayStation®, Wii®, XBox®)
+H: <country-specific indicator of wealth>
+I: <country-specific indicator of wealth>
+J: <country-specific indicator of wealth>
+K: <country-specific indicator of wealth>
+1 = Yes
+2 = No
+
+VARIABLE NAME 	AUSTRALIAN NATIONAL OPTION
+BSBG06H 	Musical instruments (e.g., piano, violin, guitar)
+BSBG06I		A quiet place to go if you need to think or concentrate
+BSBG06J-K 	Option not administered
+
+
+NATIONAL ITEM 
+BSNG07A-B
+Question:
+A: What is the highest level of education completed by your mother (or stepmother or female guardian)?
+B: What is the highest level of education completed by your father (or stepfather or male guardian)?
+1 = Some primary school or did not go to school                                                       
+2 = Finished primary school                                                                           
+3 = Finished secondary school                                                                        
+4 = Finished a TAFE training certificate, apprenticeship or traineeship                               
+5 = Finished a TAFE or college diploma (e.g. Diploma of Information Technology)                       
+6 = Finished an undergraduate degree (e.g. Bachelor of Arts)                                          
+7 = Finished a graduate or postgraduate diploma (e.g. Postgraduate Diploma of Education) 
+8 = Finished a master's degree, PhD or doctorate                                                      
+9 = I don't know 
+
+INTERNATIONAL ITEM BASED ON A NATIONAL ITEM WITH NATIONAL TERMINOLOGY
+BSBG07A-B
+A: What is the highest level of education completed by your mother (or stepmother or female guardian)?
+B: What is the highest level of education completed by your father (or stepfather or male guardian)?
+1 = Some <Primary education— ISCED Level 1 or Lower secondary education—ISCED Level 2> or did not go to school
+2 = <Lower secondary education—ISCED Level 2>                                                                 
+3 = <Upper secondary education—ISCED Level 3>                                                                 
+4 = <Post-secondary, non-tertiary education—ISCED Level 4>                                                    
+5 = <Short-cycle tertiary education—ISCED Level 5>                                                            
+6 = <Bachelor’s or equivalent level—ISCED Level 6>                                                            
+7 = <Postgraduate degree: Master’s—ISCED Level 7 or Doctor—ISCED Level 8>                                     
+8 = I don’t know                                                                     
+
+Variable Name	Documentation
+BSBG07A-B	National options recoded (from BSNG07A-B) for international comparability:
+		1 = Some primary school or did not go to school                                                       
+		2 = Finished primary school                                                                           
+		3 = Finished secondary school                                                                        
+		4 = Finished a TAFE training certificate, apprenticeship or traineeship                               
+		5 = Finished a TAFE or college diploma (e.g. Diploma of Information Technology)                       
+		6 = Finished an undergraduate degree (e.g. Bachelor of Arts) \ Finished a graduate or postgraduate diploma (e.g. Postgraduate Diploma of Education) 
+		7 = Finished a master's degree, PhD or doctorate                                                      
+		8 = I don't know                                                       
+                                                    
+
+NATIONAL ITEM 
+BSNG08
+Question:
+How far in your education do you expect to go?
+1 = Finish Year 10                                                                                  
+2 = Finish Year 12                                                                                  
+3 = Finish a TAFE training certificate, apprenticeship or traineeship                               
+4 = Finish a TAFE or college diploma (e.g. Diploma of Information Technology)                       
+5 = Finish an undergraduate degree (e.g. Bachelor of Arts)                                          
+6 = Finish a graduate or postgraduate diploma (e.g. Postgraduate Diploma of Education) 
+7 = Finish a master's degree, PhD or doctorate 
+
+INTERNATIONAL ITEM BASED ON A NATIONAL ITEM WITH NATIONAL TERMINOLOGY
+BSBG08
+Question:
+How far in your education do you expect to go?
+1 = Finish <Lower secondary education—ISCED Level 2>                            
+2 = Finish <Upper secondary education—ISCED Level 3>                            
+3 = Finish <Post-secondary, non-tertiary education—ISCED Level 4>               
+4 = Finish <Short-cycle tertiary education—ISCED Level 5>                       
+5 = Finish <Bachelor’s or equivalent level—ISCED Level 6>                       
+6 = Finish <Postgraduate degree: Master’s—ISCED Level 7 or Doctor—ISCED Level 8>
+
+Variable Name	Documentation
+BSBG08		National options recoded (from BSNG08) for international comparability:
+		1 = Finish Year 10                                                                                  
+		2 = Finish Year 12                                                                                  
+		3 = Finish a TAFE training certificate, apprenticeship or traineeship                               
+		4 = Finish a TAFE or college diploma (e.g. Diploma of Information Technology)                       
+		5 = Finish an undergraduate degree (e.g. Bachelor of Arts) \ Finish a graduate or postgraduate diploma (e.g. Postgraduate Diploma of Education) 
+		6 = Finish a master's degree, PhD or doctorate                                                      
+
+NATIONAL ITEMS
+BSXG28A-B
+Question:
+What kind of work does your father (or stepfather or male guardian) and mother (or stepmother or female guardian) do for their main jobs?
+A: Your father
+B: Your mother
+1 = Has never worked for pay                                                                                                                                                                                                                                
+2 = Small Business Owner                                                                                                                                                                                                                                    
+Includes owners of small businesses (fewer than 25 employees) such as retail shops, services, restaurants                                                                                                                                                  
+3 = Clerk                                                                                                                                                                                                                                                   
+Includes office clerks; secretaries; typists; data entry operators; customer service clerks                                                                                                                                                                
+4 = Service or Sales Worker                                                                                                                                                                                                                                 
+Includes travel attendants; restaurant service workers; personal care workers; protective service workers; junior military and police; salespersons; street vendors                                                                                        
+5 = Skilled Agricultural or Fishery Worker                                                                                                                                                                                                                  
+Includes farmers; forestry workers; fishery workers; hunters and trappers                                                                                                                                                                                  
+6 = Craft or Trade Worker                                                                                                                                                                                                                                   
+Includes builders, carpenters, plumbers, electricians,                                                                                                                                                                                                     
+metal workers; machine mechanics; handicraft workers                                                                                                                                                                                                       
+7 = Plant or Machine Operator                                                                                                                                                                                                                               
+Includes plant and machine operators; assembly line operators; motor vehicle drivers                                                                                                                                                                       
+8 = General Labourers                                                                                                                                                                                                                                       
+Includes domestic helpers and cleaners; building caretakers; messengers, porters and doorkeepers; farm, fishery, agricultural and construction workers                                                                                                     
+9 = Corporate Manager or Senior Official                                                                                                                                                                                                                    
+Includes corporate managers such as managers of large companies (25 or more employees) or managers of departments within large companies; legislators or senior government officials; senior officials of special interest organisations; military officers
+10 = Professional                                                                                                                                                                                                                                           
+Includes scientists; mathematicians; computer scientists; architects; engineers; life science and health professionals; teachers; legal professionals; social scientists; writers and artists; religious professionals                                     
+11 = Technician or Associate Professional                                                                                                                                                                                                                   
+Includes science, engineering, and computer associates and technicians; life science and health technicians and assistants; teacher aides; finance and sales associate professionals; business service agents; administrative assistants                   
+12 = Not applicable                                                                                                                                                                                                                                         
+
+
+*********BTMAUSM6 /BTSAUSM6 - Teacher Background data********.
+
+NATIONAL ITEM 
+BTNG04
+Question:
+What is the highest level of formal education you have completed?
+1 = A TAFE or  college diploma
+2 = An undergraduate or bachelor's degree
+3 = A graduate or postgraduate diploma [NEW]
+4 = A master's degree
+5 = A PhD or doctorate
+
+INTERNATIONAL ITEM BASED ON A NATIONAL ITEM WITH NATIONAL TERMINOLOGY
+BTBG04
+Question:
+What is the highest level of formal education you have completed?
+1 = Did not complete <Upper secondary education—ISCED Level 3>
+2 = <Upper secondary education—ISCED Level 3> (If you have not completed <post-secondary or tertiary education>, go to #G6)
+3 = <Post-secondary, non-tertiary education—ISCED Level 4>
+4 = <Short-cycle tertiary education—ISCED Level 5>
+5 = <Bachelor’s or equivalent level—ISCED Level 6>
+6 = <Master’s or equivalent level—ISCED Level 7>
+7 = <Doctor or equivalent level—ISCED Level 8>
+
+Variable Name	Documentation
+BTBG04		National options recoded (from ATNG04) for international comparability:
+		1 = Did not complete <Upper secondary education—ISCED Level 3> [NOT ADMINSTERED IN AUSTRALIA]
+		2 = <Upper secondary education—ISCED Level 3> [NOT ADMINSTERED IN AUSTRALIA]
+		3 = <Post-secondary, non-tertiary education—ISCED Level 4> [NOT ADMINSTERED IN AUSTRALIA]
+		4 = A TAFE or  college diploma
+		5 = An undergraduate or bachelor's degree / A graduate or postgraduate diploma 
+		6 = A master's degree
+		7 = A PhD or doctorate
+
+
+*****************************----*************************.
+
+
+
+
+
+
+
+
+
+             
+
+
+			
+                 
