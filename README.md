@@ -16,6 +16,10 @@ Xiaojun Zeng </br>
 TBA
 
 ### Resources
-Add links as we get them
+Australian Statistical Geography Standard (ASGS)   https://www.abs.gov.au/websitedbs/D3310114.nsf/home/Australian+Statistical+Geography+Standard+(ASGS)  
+SEIFA Measures and Scores  
+https://www.abs.gov.au/ausstats/abs@.nsf/Lookup/by%20Subject/2033.0.55.001~2016~Main%20Features~SEIFA%20Measures~14  
+Tidy Data by Hadley Wickham  
+https://www.jstatsoft.org/index.php/jss/article/view/v059i10/v59i10.pdf  
 
 ### Additional comments
