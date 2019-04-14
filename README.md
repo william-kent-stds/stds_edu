@@ -4,19 +4,13 @@
 At a high level the subject of this research with be education
 
 #### The Team
-Susannah Gynther
-
-Robert Kell
-
-Will Kent
-
-Htet Naing Aung
-
-James Tesoriero
-
-Reasmey Tith
-
-Xiaojun Zeng
+Susannah Gynther </br>
+Robert Kell </br>
+Will Kent </br>
+Htet Naing Aung </br>
+James Tesoriero </br>
+Reasmey Tith </br>
+Xiaojun Zeng </br>
 
 #### Question
 TBA
