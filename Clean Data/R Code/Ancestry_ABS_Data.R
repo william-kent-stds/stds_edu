@@ -15,6 +15,9 @@ clean_data <- raw_data %>%
                                TRUE ~ "Both_Parents_Born_Overseas")) %>% 
   group_by(SA2_CODE, PBO_GROUP) %>% 
   summarise(Total_Value = sum(obsValue)) %>% 
-  spread(PBO_GROUP, Total_Value)
+  spread(PBO_GROUP, Total_Value) %>% 
+  mutate(PERC_BOTH_BORN_AUST = Both_Parents_Born_Australia / (Both_Parents_Born_Overseas + One_Parent_Born_Overseas + Both_Parents_Born_Australia),
+         PERC_BOTH_BORN_OS = Both_Parents_Born_Overseas / (Both_Parents_Born_Overseas + One_Parent_Born_Overseas + Both_Parents_Born_Australia),
+         PERC_ONE_BORN_OS = One_Parent_Born_Overseas / (Both_Parents_Born_Overseas + One_Parent_Born_Overseas + Both_Parents_Born_Australia))
 
 write_csv(clean_data, "../Data Files/ABS/Ancestry_SA2.csv")
