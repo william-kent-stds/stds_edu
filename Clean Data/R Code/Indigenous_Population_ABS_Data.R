@@ -3,7 +3,7 @@ library(tidyverse)
 #getwd()
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
-raw_data <- read_csv("../../Raw Data/Data Files/ABS/Indigenous_Population_SA2_2016.csv")
+raw_data <- read.csv("../../Raw Data/Data Files/ABS/Indigenous_Population_SA2_2016.csv", quote = "\"")
 
 # Keep only indigenous population metrics at the person level(?), Band ages and spread for 1 SA3 per observation
 clean_data <- raw_data %>% 
