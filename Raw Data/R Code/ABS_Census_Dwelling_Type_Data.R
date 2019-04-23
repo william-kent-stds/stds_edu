@@ -26,7 +26,8 @@ dwelling_data %>%
   distinct(DWTD_2016)
 
 ## Retrieve Metadata to help with decoding values.
-dataStructure <- readSDMX("http://stat.data.abs.gov.au/restsdmx/sdmx.ashx/GetDataStructure/ABS_C16_T24_SA")
+ds_url = "http://stat.data.abs.gov.au/restsdmx/sdmx.ashx/GetDataStructure/ABS_C16_T24_SA"
+dataStructure <- readSDMX(ds_url)
 codeList <- slot(dataStructure, "codelists")
 
 # Dwelling Type

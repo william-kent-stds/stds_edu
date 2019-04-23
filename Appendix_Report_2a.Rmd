@@ -1,0 +1,89 @@
+---
+title: "Appendix"
+output:
+  pdf_document: default
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+#### Appendix 1 - Example of Australian Bureau of Statistics Census 2016 data extract R code
+``` {r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+library(rsdmx)
+library(tidyverse)
+
+#getwd()
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
+# Check to make sure the ABS folder is available and, if not, create it. Saving file to right location will fail without the required folder
+if (!dir.exists("../Data Files/ABS")) {
+  create.dir("../Data Files/ABS")
+}
+
+# Get the ABS Census 2016 Data on Dwelling Type 
+dwelling_data <- as.data.frame(readSDMX(providerId = "ABS", resource = "data", flowRef = "ABS_C16_T24_SA"
+                                        ,key = "TOT.TOT+11+21+22+31+32+33+34+91+92+93+94+Z+NA.0+1+2+3+4+5+6+7+8+9.SA2"
+                                        ,key.mode = "SDMX"
+                                        ,start = 2016, end = 2016))
+summary(dwelling_data)
+head(dwelling_data)
+str(dwelling_data)
+
+# MISSING 9 SA2 Codes
+dwelling_data %>% 
+  distinct(ASGS_2016)
+
+# Distinct dimension values
+dwelling_data %>% 
+  distinct(DWTD_2016)
+
+## Retrieve Metadata to help with decoding values.
+ds_url = "http://stat.data.abs.gov.au/restsdmx/sdmx.ashx/GetDataStructure/ABS_C16_T24_SA"
+dataStructure <- readSDMX(ds_url)
+codeList <- slot(dataStructure, "codelists")
+
+# Dwelling Type
+dwelling_type <- as.data.frame(codeList, codelistId = "CL_ABS_C16_T24_SA_STRD_2016")
+
+# Get Required Data and put in meaningful descriptions
+dwelling_data_final <- dwelling_data %>% 
+  inner_join(dwelling_type, by = c("STRD_2016" = "id")) %>% 
+  select(SA2_CODE = ASGS_2016
+         ,DWELLING_TYPE = label.en
+         ,obsValue)
+
+#getwd()
+write_csv(dwelling_data_final, "../Data Files/ABS/Dwelling_Type_SA2_2016.csv")
+```
+
+\newpage
+#### Appendix 2 - Example of NSW Government Air Quality data download using R
+``` {r}
+#getwd()
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
+if (!dir.exists("../Data Files/NSWGovt/")) {
+  dir.create("../Data Files/NSWGovt/")
+}
+
+## Download NSW Air Quality File if it doesn't already exist
+if (!file.exists("../Data Files/NSWGovt/AirQuality_Data.xls")) {
+  aq = "https://airquality.environment.nsw.gov.au/aquisnetnswphp/tmp/tmp_table_21553_1555911469.xls"
+  download.file(aq,
+              destfile = "../Data Files/NSWGovt/AirQuality_Data.xls",
+              mode = "wb")
+}
+
+## Download NSW Air Quality Stations if it doesn't already exist
+if (!file.exists("../Data Files/NSWGovt/AirQuality_Station_Data.xlsx")) {
+  stations = paste0("https://datasets.seed.nsw.gov.au/dataset/",
+                    "ee5fd225-ab54-49c4-8c91-930219018cd0/resource/",
+                    "e09a1918-af2b-4375-ad04-00fabce72a10/download/",
+                    "air-quality-monitoring-sites-summary.xlsx")
+  download.file(stations,
+                destfile = "../Data Files/NSWGovt/AirQuality_Stations_Data.xlsx",
+                mode = "wb")
+}
+```
