@@ -6,11 +6,10 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 # Check to make sure the ABS folder is available and, if not, create it. Saving file to right location will fail without the required folder
 if (!dir.exists("../Data Files/ABS")) {
-  # readSDMX can create url's to read data from registered providers - fortunately the ABS is registered so the url can be created for us.
   create.dir("../Data Files/ABS")
 }
 
-# Get the ABS Census 2016 Data on Indigenous populations 
+# Get the ABS Census 2016 Data on Dwelling Type 
 dwelling_data <- as.data.frame(readSDMX(providerId = "ABS", resource = "data", flowRef = "ABS_C16_T24_SA",
                                              key = "TOT.TOT+11+21+22+31+32+33+34+91+92+93+94+Z+NA.0+1+2+3+4+5+6+7+8+9.SA2", key.mode = "SDMX",
                                              start = 2016, end = 2016))
@@ -22,13 +21,12 @@ str(dwelling_data)
 dwelling_data %>% 
   distinct(ASGS_2016)
 
+# Distinct dimension values
 dwelling_data %>% 
   distinct(DWTD_2016)
 
 ## Retrieve Metadata to help with decoding values.
 dataStructure <- readSDMX("http://stat.data.abs.gov.au/restsdmx/sdmx.ashx/GetDataStructure/ABS_C16_T24_SA")
-
-#concepts <- as.data.frame(slot(dataStructure, "concepts"))
 codeList <- slot(dataStructure, "codelists")
 
 # Dwelling Type
