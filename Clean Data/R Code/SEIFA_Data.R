@@ -13,7 +13,6 @@ head(seifa_data)
 summary(seifa_data)
 seifa_nas <- seifa_data %>% 
   filter(is.na(obsValue) == TRUE)
-view(seifa_nas)
 
 # Create a clean data set for use - only want high level scores and remove records with an obsValue of NA
 clean_seifa_data <- 

@@ -1,5 +1,6 @@
 library(tidyverse)
 library(data.table)
+library(janitor)
 
 #getwd()
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -61,6 +62,7 @@ clean_data <- clean_data_1 %>%
   select(SA2_CODE
         ,BORN_OVERSEAS = Overseas
         ,PERC_BORN_OVERSEAS) %>% 
-  inner_join(clean_data_2, by = "SA2_CODE")
+  inner_join(clean_data_2, by = "SA2_CODE") %>% 
+  clean_names("screaming_snake")
 
 write_csv(clean_data, "../Data Files/ABS/Place_Of_Birth_SA2.csv")
