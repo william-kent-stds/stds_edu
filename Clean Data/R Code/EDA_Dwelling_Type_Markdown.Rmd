@@ -1,0 +1,179 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## EDA for Dwelling Type data
+
+First start by getting the libraries that we need.
+
+```{r library, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(Hmisc)
+library(corrplot)
+```
+
+The second step is to make sure the code runs in the right path. This is ensured by setting the working directory to the location of this markdown file. As per, https://github.com/rstudio/rstudio/issues/1738, this is expected so removing from the markdown code but will keep in R files.
+
+```{r location}
+#getwd()
+#setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+```
+
+Now that the working directory has been set the data can be retrieved from the csv files. Both dwelling type and the NSW mesh block csv's are retrieved; mesh blocks are for filtering and for providing context about where in NSW the SA2 code is.
+
+Once the mesh block data has been loaded it is rolled up to a SA2 level; check for duplicates.
+
+```{r data, warning = FALSE, message = FALSE}
+# read cleaned data set
+dwelling_type <- read_csv("../Data Files/ABS/Dwelling_Type_SA2.csv")
+mesh_blocks <- read_csv("../../Raw Data/Data Files/ABS/Mesh_Blocks/MB_2016_NSW.csv")
+#str(mesh_blocks)
+
+# Get mesh block data at SA2 level
+sa2_data <- mesh_blocks %>% 
+  distinct(SA2_MAINCODE_2016, SA2_NAME_2016, STATE_CODE_2016, STATE_NAME_2016)
+
+# No duplicate SA2 Codes
+sa2_data %>% 
+  group_by(SA2_MAINCODE_2016) %>% 
+  summarise(cnt = n()) %>% 
+  filter(cnt > 1)
+```
+
+## Data Checks
+The first check is run against the total number of dwellings in a SA2. The returned histogram seems to indicate there are SA2's with zero dwellings.
+
+```{r}
+# Some SA2's don't have any dwellings - positive skew
+dwelling_type %>% 
+  mutate(TOTAL= DWELLING_HOUSE + DWELLING_FLAT + DWELLING_SEMI + DWELLING_OTHER) %>% 
+  ggplot() +
+  geom_histogram(aes(x = TOTAL), bins = 50)
+```
+
+By looking closely at the SA2's in NSW with no dwellings it is obviously this data is reasonably correct as they include a military base, a park and a cemetry.
+
+```{r}
+# 62 SA2's have no dwellings - 7 in NSW, a military base, centennial park, a NP, a cemetry, and Industrial area, Banksmeadow is whaves and industry
+dwelling_type %>% 
+  mutate(TOTAL= DWELLING_HOUSE + DWELLING_FLAT + DWELLING_SEMI + DWELLING_OTHER) %>% 
+  filter(TOTAL == 0) %>% 
+  left_join(sa2_data, by = c("SA2_CODE" = "SA2_MAINCODE_2016")) %>% 
+  select(SA2_CODE, TOTAL, SA2_NAME_2016, STATE_NAME_2016) %>% 
+  filter(between(SA2_CODE,100000000,200000000))
+```
+
+There are also a number of SA2's with a high number of dwellings. Are these outliers correct? The one SA2 with over 15000 dwellings is located in Waterloo/Beaconsfield in Sydney. This area is highly populated so 15,000 dwellings may not be wrong
+.
+```{r}
+# There are a couple of areas with high numbers of dwellings - Waterloo/Beaconsfield in NSW is high density
+dwelling_type %>% 
+  mutate(TOTAL= DWELLING_HOUSE + DWELLING_FLAT + DWELLING_SEMI + DWELLING_OTHER) %>% 
+  filter(TOTAL > 15000) %>% 
+  left_join(sa2_data, by = c("SA2_CODE" = "SA2_MAINCODE_2016")) %>% 
+  select(SA2_CODE, TOTAL, SA2_NAME_2016, STATE_NAME_2016) %>% 
+  filter(between(SA2_CODE,100000000,200000000))
+```
+
+
+For the rest of this analysis the SA2's with no dwellings will be removed but the Waterloo/Beaconsfield SA2 will be kept in as the result appears to be valid. The inner join to the sa2_data will filter out all non-NSW SA2's.
+
+```{r}
+# Remove SA2's with no dwellings and only show NSW SA2's
+dwelling_type_filtered <- dwelling_type %>% 
+  mutate(TOTAL= DWELLING_HOUSE + DWELLING_FLAT + DWELLING_SEMI + DWELLING_OTHER) %>% 
+  filter(TOTAL != 0) %>% 
+  inner_join(sa2_data, by = c("SA2_CODE" = "SA2_MAINCODE_2016"))
+```
+
+### Normal Distribution check
+
+With the filtered dataset check for normality. For GLM's I don't think normality is absolutely required unless we start calculating p values. Normally distributed data is required for correctly calculating p values.
+
+Start by plotting a histogram for each of the dwelling bands and check shape of plot.
+
+#### Dwelling - House
+```{r house}
+## DWELLING HOUSE
+# Some areas in NSW have no houses - data may be slightly skewed
+dwelling_type_filtered %>%
+  ggplot() +
+  geom_histogram(aes(x = DWELLING_HOUSE), bins = 50)
+```
+
+In addition a QQ-plot is created using standardised values. The standardisation calculation is:
+$$z = \frac{x - \mu}{\delta}$$
+A QQ-plot shows how close a sample is to normal distribution. The QQ plot orders the $z$ scores from low to high and plots each value's $z$ score on the y axis; the x axis is the corresponding quantile of a normal distribution. Plots that closely follow the line are normally distributed.
+
+```{r house_qq}
+# Standardise data and confirm data has a long tail 
+house_std <- scale(dwelling_type_filtered$DWELLING_HOUSE)
+qqnorm(house_std)
+abline(a = 0, b = 1, col = 'grey')
+```
+
+#### Dwelling - Flat
+Normal distribution is checked for flats but first the SA2's with no flats are checked and seem to be OK. The areas returned are industrial areas, offshore shipping and rural areas which probably don't have flats.
+
+As can be seen flat data is defintiely not normally distributed.
+```{r flat}
+## DWELLING FLAT
+# There are 21 no flat SA2's in NSW - industrial areas, offshore shipping, Rural areas
+dwelling_type_filtered %>% 
+  filter(DWELLING_FLAT == 0) %>% 
+  select(SA2_CODE, SA2_NAME_2016, PERC_DWELLING_HOUSE, PERC_DWELLING_FLAT, PERC_DWELLING_SEMI, PERC_DWELLING_OTHER)
+
+# Some areas in NSW have no houses - data skewed
+dwelling_type_filtered %>%
+  ggplot() +
+  geom_histogram(aes(x = DWELLING_FLAT), bins = 100)
+
+# Standardise data and confirm data is not normally distributed 
+flat_std <- scale(dwelling_type_filtered$DWELLING_FLAT)
+qqnorm(flat_std)
+abline(a = 0, b = 1, col = 'grey')
+```
+
+#### Dwelling - Semi
+There are 19 SA2's with no flats but these seem reasonable. Semi detached dwelling data is not normally distributed.
+```{r semi}
+## DWELLING SEMI
+# There are 19 no semi SA2's in NSW - industrial areas, airport, offshore shipping, rural areas
+dwelling_type_filtered %>% 
+  filter(DWELLING_SEMI == 0) %>% 
+  select(SA2_CODE, SA2_NAME_2016, PERC_DWELLING_HOUSE, PERC_DWELLING_FLAT, PERC_DWELLING_SEMI, PERC_DWELLING_OTHER)
+
+# Some areas in NSW have no houses - data skewed
+dwelling_type_filtered %>%
+  ggplot() +
+  geom_histogram(aes(x = DWELLING_SEMI), bins = 100)
+
+# Standardise data and confirm data is not normally distributed 
+semi_std <- scale(dwelling_type_filtered$DWELLING_SEMI)
+qqnorm(semi_std)
+abline(a = 0, b = 1, col = 'grey')
+```
+
+### Correlations check
+Using the Hmisc::rcorr function shows that there are some positive and negative correlations but nothing seriously high.
+
+The corrplot::corrplot function shows this visually.
+```{r}
+# Check correlation between variables
+dwelling_matrix <- dwelling_type_filtered %>% 
+  select(DWELLING_FLAT,DWELLING_HOUSE,DWELLING_OTHER,DWELLING_SEMI) %>% 
+  as.matrix()
+
+# Show values - nothing really high
+rcorr(dwelling_matrix, type = "pearson")
+
+# And a plot for good measure
+corrplot(cor(dwelling_matrix), method = "ellipse")
+```
+
+### Questions
+What do we want to do with SA2's with no dwellings?
