@@ -3,17 +3,20 @@ library(tidyverse)
 #getwd()
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
-## Read the raw data csv
+# Create destination folder if it doesn't already exists
+if (!dir.exists("../Data Files/ABS/")) {
+  dir.create("../Data Files/ABS/")
+}
+
+# Read the raw data csv
 mesh_blocks <- read.csv("../../Raw Data/Data Files/ABS/Mesh_Blocks/MB_2016_NSW.csv")
 
 str(mesh_blocks)
 
 mesh_blocks %>% 
   distinct(MB_CATEGORY_NAME_2016)
-# Have to change MB_CODE_2016 from factor to numeric
-#mesh_block_cnts <- mesh_block_cnts %>% 
-#  mutate(MB_CODE_2016 = as.numeric(levels(MB_CODE_2016))[MB_CODE_2016])
 
+# Find % of space allocated to Parkland for each mesh block
 open_space <- mesh_blocks %>% 
   filter(STATE_NAME_2016 == "New South Wales") %>% 
   select(MB_CODE_2016
@@ -26,5 +29,6 @@ open_space <- mesh_blocks %>%
   mutate(PERC_OPEN_SPACE = Parkland / (Commercial + Education + `Hospital/Medical` + Industrial + MIGRATORY + NOUSUALRESIDENCE + OFFSHORE +
                                          Other + Parkland + `Primary Production` + Residential + SHIPPING + Transport + Water))
 
+# Write data to csv
 write_csv(open_space, "../Data Files/ABS/Open_Space_SA2.csv")
 
