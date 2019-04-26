@@ -1,13 +1,21 @@
 library(tidyverse)
+library(slackr) # to find channel id
 library(httr)
 library(jsonlite)
 
 # Go to https://api.slack.com/custom-integrations/legacy-tokens and generate a Legacy token for the UTS MDSI workspace
-# Token = To Be Added
 
 # Set up slack integration
-token <- "To Be Added"
-api_url <- paste0("https://slack.com/api/groups.history?token=",token,"&channel=GH834L2RK&pretty=1")
+token <- "ToBeAdded"
+
+# Find the channel Id
+grp <- slackr_groups(api_token = token)
+grp_id <- grp %>% 
+  filter(name == "pv_stds_edu") %>% 
+  select(id)
+
+# Set Get Url
+api_url <- paste0("https://slack.com/api/groups.history?token=",token,"&channel=",grp_id,"&pretty=1")
 
 # Get request to Slack and store JSON response
 resp <- GET(api_url)
