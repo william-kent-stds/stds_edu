@@ -27,3 +27,7 @@ https://data.cese.nsw.gov.au/data/dataset/nsw-non-government-school-locations-an
 ### NSW Office of Environment and Heritage  
 Air Quality Index  
 https://www.environment.nsw.gov.au/aqms/search.htm  
+
+## Transport for NSW
+Mode of travel and reason for travel by LGA
+https://opendata.transport.nsw.gov.au/

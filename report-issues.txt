@@ -1,0 +1,4 @@
+First, there can be some issues in data merging since various datasets were gathered and processed by different members introducing inconsistent formats. Second, we may need to gather some new datasets during the project but the datasets we finally want maybe not at the same level of granularity. We also need to consider the reliability of the data from ABS as there were some false or nonsensical answers in the collection of census data (Catherine Hanrahan 2017). Finally, the result from the analysis and modelling might be completely different from our expectation - i.e., there can be no correlation between employment and other chosen variables in our model.
+
+Catherine Hanrahan 2017, Census results are out, but can we trust the data?, ABC News, viewed 27 April 2019, < https://www.abc.net.au/news/2017-06-26/census-results-are-coming-out-can-we-trust-them/8594132>
+
