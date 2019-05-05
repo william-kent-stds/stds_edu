@@ -1,6 +1,8 @@
 library(tidyverse)
 library(Hmisc)
 library(corrplot)
+library(sf)
+library(viridis)
 
 #getwd()
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
