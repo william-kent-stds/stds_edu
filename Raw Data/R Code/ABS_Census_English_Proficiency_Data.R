@@ -40,9 +40,11 @@ age <- as.data.frame(codeList, codelistId = "CL_ABS_C16_T08_SA_AGE")
 # Get Required Data and put in meaningful descriptions
 land_prof_final <- land_prof_data %>% 
   inner_join(english_proficiency, by = c("ENGLP_2016" = "id")) %>% 
+  inner_join(age, by = c("AGE" = "id")) %>% 
   select(SA2_CODE = ASGS_2016
-         ,DWELLING_TYPE = label.en
+         ,ENG_PROFICIENCY = label.en.x
+         ,AGE_BAND = label.en.y
          ,obsValue)
 
 #getwd()
-write_csv(dwelling_data_final, "../Data Files/ABS/Dwelling_Type_SA2_2016.csv")
+write_csv(land_prof_final, "../Data Files/ABS/English_Proficiency_SA2_2016.csv")
