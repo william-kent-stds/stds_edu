@@ -13,6 +13,7 @@ library(Hmisc)
 library(corrplot)
 library(sf)
 library(viridis)
+library(Amelia)
 ```
 #### Get the data  
 Get data and limit it to New South Wales only
@@ -81,7 +82,7 @@ abline(a = 0, b = 1, col = 'grey')
 
 Percent is definitely not normally distributed with the big positive skew. In most SA2's close to 100% of households speak English but there are some areas with a really low proportion of the households that speak English. Where are there areas?
 
-```{r low_english_hh}
+```{r low_english_hh, warning = FALSE, message = FALSE}
 nsw_lah_data %>% 
   filter(PERC_LANG_HOME_ENGLISH < 0.25) %>% 
   select(SA2_CODE, SA2_NAME_2016, PERC_LANG_HOME_ENGLISH) %>% 
@@ -90,7 +91,22 @@ nsw_lah_data %>%
 
 Only 10% of people speak English in Auburn North; 14% in Auburn Central. Wow that surprises me a little.  
 
-Lets see how this looks against unemployment rates.
+Before we go any further let's do a check for NA values. 
+```{r missing, warning = FALSE, message = FALSE}
+missmap(nsw_lah_data, x.cex = 0.4)
+```
+
+There isn't a lot of missing data. A couple of missing PERC_LANG_HOME_ENGLISH values but otherwise it is pretty complete. Where are these missing values? And why?
+
+```{r miss_data, warning = FALSE, message = FALSE}
+nsw_lah_data %>% 
+  filter(is.na(PERC_LANG_HOME_ENGLISH)) %>% 
+  select(SA2_CODE, SA2_NAME_2016, PERC_LANG_HOME_ENGLISH, LANG_HOME_ENGLISH)
+```
+
+The usual suspects. Caused by zero values for each of the inputs into the percentage calculation. I could set these to zero percent, or just remove from the dataset .... hmmm decisions.  
+
+Whilst I'm making that decision lets see how language at home looks against unemployment rates.
 ```{r lang_unemployment, warning = FALSE, message = FALSE}
 nsw_lah_data %>% 
   inner_join(employed_data, by = c("SA2_CODE")) %>% 

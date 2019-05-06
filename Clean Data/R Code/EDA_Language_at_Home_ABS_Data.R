@@ -3,6 +3,7 @@ library(Hmisc)
 library(corrplot)
 library(sf)
 library(viridis)
+library(Amelia)
 
 #getwd()
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -57,6 +58,13 @@ nsw_lah_data %>%
   arrange(PERC_LANG_HOME_ENGLISH)
 
 # Only 10% of people speak English in Auburn North, 14% in Auburn Central
+# Have a look at missing values
+missmap(nsw_lah_data, x.cex = 0.4)
+
+nsw_lah_data %>% 
+  filter(is.na(PERC_LANG_HOME_ENGLISH)) %>% 
+  select(SA2_CODE, SA2_NAME_2016, PERC_LANG_HOME_ENGLISH, LANG_HOME_ENGLISH)
+
 # How does that look against unemployment rates
 nsw_lah_data %>% 
   inner_join(employed_data, by = c("SA2_CODE")) %>% 
