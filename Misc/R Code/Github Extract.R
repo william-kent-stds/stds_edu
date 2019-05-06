@@ -5,7 +5,7 @@ library(httpuv)
 library(httr)
 library(tidyverse)
 
-# Config Variables to loop over pages
+# Config Variables to loop over pages - add more as required
 pages <- c(1,2,3)
 
 # Remove dataframe
@@ -26,7 +26,7 @@ github_token <- oauth2.0_token(oauth_endpoints("github"), myapp)
 
 # Use API
 gtoken <- config(token = github_token)
-uri <- "https://api.github.com/repos/william-kent-stds/stds_edu/commits?per_page=50&page="
+uri <- "https://api.github.com/repos/<owner>/<repo_name>/commits?per_page=50&page="
 
 for(page in pages){
   

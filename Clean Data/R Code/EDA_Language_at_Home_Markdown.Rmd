@@ -1,0 +1,181 @@
+---
+title: "EDA Language At Home"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, include = FALSE}
+library(tidyverse)
+library(Hmisc)
+library(corrplot)
+library(sf)
+library(viridis)
+library(Amelia)
+```
+#### Get the data  
+Get data and limit it to New South Wales only
+```{r get_data, warning = FALSE, message = FALSE}
+# read cleaned data set
+lah_data <- read_csv("../Data Files/ABS/Language_at_Home_SA2.csv")
+employed_data <- read_csv("../Data Files/ABS/Employed_SA2.csv")
+sa2_data <- read_csv("../../Raw Data/Data Files/ABS/Mesh_Blocks/MB_2016_NSW.csv")
+
+nsw_sa2 <- sa2_data %>% 
+  filter(STATE_NAME_2016 == "New South Wales") %>% 
+  distinct(SA2_MAINCODE_2016, SA2_NAME_2016)
+
+# Get language at home data for NSW only
+nsw_lah_data <- lah_data %>% 
+  inner_join(nsw_sa2, by = c("SA2_CODE" = "SA2_MAINCODE_2016"))
+```
+
+#### Review the data
+```{r review, warning = FALSE, message = FALSE}
+glimpse(nsw_lah_data)
+```
+
+#### Explore the data
+```{r eda, warning = FALSE, message = FALSE}
+# Plot the number of homes where english is the langauage spoken at home
+nsw_lah_data %>% 
+  ggplot() +
+  geom_histogram(aes(x = LANG_HOME_ENGLISH), bins = 50)
+```
+
+The data for when English is the language spoken at home seems normally distributed. What does the QQ plot say?
+```{r qqplot, warning = FALSE, message = FALSE}
+# Other than the tail (the zeros) it seems to be close to normal distribution
+lah_std <- scale(nsw_lah_data$LANG_HOME_ENGLISH)
+qqnorm(lah_std)
+abline(a = 0, b = 1, col = 'grey')
+```
+
+Other than the zeros the data is fairly well normally distributed.  
+
+Some SA2's appear to have zero homes where English is spoken at home. Where are these places?
+```{r zero_english, warning = FALSE, message = FALSE}
+# Some SA2's have zero homes that speak English - where are they?
+nsw_lah_data %>% 
+  filter(LANG_HOME_ENGLISH < 10) %>% 
+  select(SA2_CODE, SA2_NAME_2016, LANG_HOME_ENGLISH)
+```
+
+These are industrial areas, military bases and a cemetery (three dwellings speak English at home in Rockwood Cemetery - spooky).  
+
+These are the total number of households where English is spoken. What about the percentages? Do they differ much?
+```{r percent, warning = FALSE, message = FALSE}
+# What about percentages
+nsw_lah_data %>% 
+  ggplot() +
+  geom_histogram(aes(x = PERC_LANG_HOME_ENGLISH), bins = 50)
+```
+
+And the QQ plot
+```{r percent_qq, warning = FALSE, message = FALSE}
+lah_std <- scale(nsw_lah_data$PERC_LANG_HOME_ENGLISH)
+qqnorm(lah_std)
+abline(a = 0, b = 1, col = 'grey')
+```
+
+Percent is definitely not normally distributed with the big positive skew. In most SA2's close to 100% of households speak English but there are some areas with a really low proportion of the households that speak English. Where are there areas?
+
+```{r low_english_hh, warning = FALSE, message = FALSE}
+nsw_lah_data %>% 
+  filter(PERC_LANG_HOME_ENGLISH < 0.25) %>% 
+  select(SA2_CODE, SA2_NAME_2016, PERC_LANG_HOME_ENGLISH) %>% 
+  arrange(PERC_LANG_HOME_ENGLISH)
+```
+
+Only 10% of people speak English in Auburn North; 14% in Auburn Central. Wow that surprises me a little.  
+
+Before we go any further let's do a check for NA values. 
+```{r missing, warning = FALSE, message = FALSE}
+missmap(nsw_lah_data, x.cex = 0.4)
+```
+
+There isn't a lot of missing data. A couple of missing PERC_LANG_HOME_ENGLISH values but otherwise it is pretty complete. Where are these missing values? And why?
+
+```{r miss_data, warning = FALSE, message = FALSE}
+nsw_lah_data %>% 
+  filter(is.na(PERC_LANG_HOME_ENGLISH)) %>% 
+  select(SA2_CODE, SA2_NAME_2016, PERC_LANG_HOME_ENGLISH, LANG_HOME_ENGLISH)
+```
+
+The usual suspects. Caused by zero values for each of the inputs into the percentage calculation. I could set these to zero percent, or just remove from the dataset .... hmmm decisions.  
+
+Whilst I'm making that decision lets see how language at home looks against unemployment rates.
+```{r lang_unemployment, warning = FALSE, message = FALSE}
+nsw_lah_data %>% 
+  inner_join(employed_data, by = c("SA2_CODE")) %>% 
+  filter(PERC_UNEMPLOYED < 0.2) %>% 
+  ggplot() +
+  geom_point(aes(x = PERC_LANG_HOME_ENGLISH, y = PERC_UNEMPLOYED)) +
+  geom_smooth(aes(x = PERC_LANG_HOME_ENGLISH, y = PERC_UNEMPLOYED))
+```
+
+There seems to be a slight relationship. The SA2's with the lowest % of people speaking English at home have the highest unemployment rates.
+
+Why not check if there is a relationship for a particular language.
+```{r swasia, warning = FALSE, message = FALSE}
+nsw_lah_data %>% 
+  inner_join(employed_data, by = c("SA2_CODE")) %>% 
+  filter(PERC_UNEMPLOYED < 0.2) %>% 
+  ggplot() +
+  geom_point(aes(x = LANG_HOME_SWASIA, y = PERC_UNEMPLOYED))
+```
+
+Plots for other languages looked similar to South West Asia represented here. Maybe we need to go to a finer level of granularity.  
+
+Now we'll do some stuff with maps because that is cool.
+```{r maps, warning = FALSE, message = FALSE}
+# Now we'll do some stuff with maps - because they look cool
+sa2_shape <- st_read("../../Raw Data/Data Files/ABS/SA2_Shapefile/SA2_2016_AUST.shp", quiet = TRUE)
+combined_df <- merge(nsw_lah_data, sa2_shape, by.x = "SA2_CODE", by.y = "SA2_MAIN16")
+
+# For greater Sydney to start with
+combined_df %>% 
+  filter(GCC_NAME16 == "Greater Sydney") %>% 
+  ggplot() +
+  geom_sf(aes(fill = PERC_LANG_HOME_ENGLISH)) +
+  scale_fill_viridis("Percent of Household with English Spoken") +
+  theme_bw()
+```
+
+West and south west Sydney have a lower percentage of households where English is spoken at home. If you look at the unemployment rate these are the same areas with higher levels of unemployment.
+
+What about the rest of NSW 
+```{r rest_nsw, warning = FALSE, message = FALSE}
+combined_df %>% 
+  ggplot() +
+  geom_sf(aes(fill = PERC_LANG_HOME_ENGLISH)) +
+  scale_fill_viridis("Percent of Household with English Spoken") +
+  theme_bw()
+```
+
+And the state is pretty much yellow, i.e. low numbers of people speaking anything other than English at home. Migrants tend to congregate in major city centres and this map seems to confirm that.  
+
+Lets run a correlation test to see if any of the variables relate to each other.
+
+```{r corr, warning = FALSE, message = FALSE}
+# Check correlation between variables
+nsw_lah_matrix <- nsw_lah_data %>% 
+  select(LANG_HOME_ENGLISH,LANG_HOME_EASIA,LANG_HOME_NEUROPE,LANG_HOME_INDIGENOUS,LANG_HOME_EEUROPE,LANG_HOME_OTHER,LANG_HOME_SASIA,LANG_HOME_SEUROPE,
+         LANG_HOME_SWASIA) %>% 
+  as.matrix()
+
+# Show values - nothing really high
+rcorr(nsw_lah_matrix, type = "pearson")
+
+# And a plot for good measure
+corrplot(cor(nsw_lah_matrix), method = "ellipse")
+```
+
+Interestingly there seems to be a relationship between people that speak a Northern European language (e.g. Frensh, Swedish) and areas where English is widely spoken. A similar relationship appears between Southern and Eastern Europeans.
+
+I find the slightly negative correlation between indgenous languages and non-English languages interesting. Do new migrants not settle in areas where more traditional aboriginals live? Probably not as I imagine aboriginal languages exist outside of major city centres. Does this impact a migrants understanding of aboriginal life and culture? What impact does this have on aboriginal policies etc.
+
+#### Conclusion
+Language at home does seem to have a relationship with unemployment rate and may help the model determine unemployment rates.

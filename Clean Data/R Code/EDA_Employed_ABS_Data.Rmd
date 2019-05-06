@@ -1,0 +1,122 @@
+---
+title: ''
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, include = FALSE}
+library(tidyverse)
+library(Hmisc)
+library(corrplot)
+library(rgdal)
+library(sf)
+library(viridis)
+```
+## Exploratory Data Analysis for Employment
+
+#### Retieve NSW data
+
+```{r, warning = FALSE, message = FALSE}
+employed_data <- read_csv("../Data Files/ABS/Employed_SA2.csv")
+sa2_data <- read_csv("../../Raw Data/Data Files/ABS/Mesh_Blocks/MB_2016_NSW.csv")
+
+nsw_sa2 <- sa2_data %>% 
+  filter(STATE_NAME_2016 == "New South Wales") %>% 
+  distinct(SA2_MAINCODE_2016, SA2_NAME_2016)
+
+nsw_data <- employed_data %>% 
+  inner_join(nsw_sa2, by = c("SA2_CODE" = "SA2_MAINCODE_2016"))
+```
+
+Now that the data has been retrieved need to look at the distribution of the data.
+
+```{r, warning= FALSE, message = FALSE}
+ggplot(nsw_data) +
+  geom_histogram(aes(x = PERC_UNEMPLOYED), bins = 50)
+```
+
+It looks like there are a couple of outliers above 0.2. What place in NSW has a 100% unemployment rate?
+
+```{r outliers, warning = FALSE, message = FALSE}
+# What are the outliers
+nsw_data %>% 
+  filter(PERC_UNEMPLOYED > 0.2)
+```
+
+_Port Kembla Industrial_ has a population of three unemployed people. It can probably be excluded along with _Smithfield Industrial_ and _No usual address (NSW)_. **Is this the correct decision?**  
+  
+There are also a number of places that appear to have zero unemployment. Where are these lucky places?
+
+```{r fully_employed, warning = FALSE, message = FALSE}
+# What about the zero unemployment places
+nsw_data %>% 
+  filter(PERC_UNEMPLOYED == 0.0)
+```
+
+Again there appears to be a few industrial areas - all have small populations. Is it safe to remove these? I'll keep in for now but maybe we need to remove SA2's based on population size rather than name? Is this an option? Will it help/hinder the modelling process.  
+  
+After the removal of the high end of town outliers what does the distribution look like?
+```{r dist, warning = FALSE, message = FALSE}
+nsw_data <- nsw_data %>% 
+  filter(PERC_UNEMPLOYED < 0.2)
+
+ggplot(nsw_data) +
+  geom_histogram(aes(x = PERC_UNEMPLOYED), bins = 50)
+```
+
+The data looks to be vaguely normally distributed. It could also be a Poisson distribution. What are the mean and median?  
+  
+The means is: `r mean(nsw_data$PERC_UNEMPLOYED)`  
+The median is: `r median(nsw_data$PERC_UNEMPLOYED)`  
+  
+They're pretty close in the scheme of things so lets assume normal distribution. 
+  
+Before proceeding the distribution of the total values will be observed.
+```{r, warning = FALSE, message = FALSE}
+ggplot(nsw_data) +
+  geom_histogram(aes(x = UNEMPLOYED), bins = 50)
+```
+It's a similar shape to the percentage values, vaguely normal but could be a Poisson distribution.  
+  
+To observe unemployment rates across the state the ABS SA2 shapefile is retrieved and combined with the existing NSW unemployment dataset.   
+```{r, warning = FALSE, message = FALSE}
+sa2_shape <- st_read("../../Raw Data/Data Files/ABS/SA2_Shapefile/SA2_2016_AUST.shp", quiet = TRUE)
+combined_df <- merge(nsw_data, sa2_shape, by.x = "SA2_CODE", by.y = "SA2_MAIN16")
+```
+
+To start unemployment data will be plotted for Greate Sydney.
+```{r map_sydney, warning = FALSE, message = FALSE}
+combined_df %>% 
+  filter(GCC_NAME16 == "Greater Sydney") %>% 
+  ggplot() +
+  geom_sf(aes(fill = PERC_UNEMPLOYED)) +
+  scale_fill_viridis("Percent Unemployed") +
+  theme_bw()
+```
+
+The brighter yellow locations indicate areas of relatively high unemployment. These areas are centred around Liverpool, Farifield and Cabramatta in Sydney's south west.  
+  
+In contrast lower unemployment rates are found in the Sutherland Shire, Sydney's Northern Beaches and on Sydney's outskirts.  
+  
+As for the wider state (excl. Lord Howe Island).
+
+```{r map_nsw, warning = FALSE, message = FALSE}
+combined_df %>% 
+  filter(SA2_NAME_2016 != "Lord Howe Island") %>% 
+  ggplot() +
+  geom_sf(aes(fill = PERC_UNEMPLOYED)) +
+  scale_fill_viridis("Percent Unemployed") +
+  theme_bw()
+```
+
+The south of state seems to have higher employment rates than the north.  
+  
+The regional centres of Newcastle and Wollongong have centres of high unemployment rates. Shortland - Jesmond on Newcastle's outskirts has 15% unemployment, whilst Port Kembla in the Wollongong area has an unemployment rate of 12%.  
+  
+Jindabyne and the Queanbeyan and Yass regions have some of the states lowest unemployment rates.
+
+### Data Decisions
+What do we do with SA2's with less than circa 100 people?
