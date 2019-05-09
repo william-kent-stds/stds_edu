@@ -11,11 +11,9 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 # read cleaned data set
 lah_data <- read_csv("../Data Files/ABS/Language_at_Home_SA2.csv")
 employed_data <- read_csv("../Data Files/ABS/Employed_SA2.csv")
-sa2_data <- read_csv("../../Raw Data/Data Files/ABS/Mesh_Blocks/MB_2016_NSW.csv")
+sa2_data <- read_csv("../Data Files/ABS/NSW_SA2_FOR_MODEL.csv")
 
-nsw_sa2 <- sa2_data %>% 
-  filter(STATE_NAME_2016 == "New South Wales") %>% 
-  distinct(SA2_MAINCODE_2016, SA2_NAME_2016)
+nsw_sa2 <- sa2_data
 
 # Get language at home data for NSW only
 nsw_lah_data <- lah_data %>% 
@@ -70,8 +68,14 @@ nsw_lah_data %>%
   inner_join(employed_data, by = c("SA2_CODE")) %>% 
   filter(PERC_UNEMPLOYED < 0.2) %>% 
   ggplot() +
-  geom_point(aes(x = PERC_LANG_HOME_ENGLISH, y = PERC_UNEMPLOYED)) +
-  geom_smooth(aes(x = PERC_LANG_HOME_ENGLISH, y = PERC_UNEMPLOYED))
+  geom_point(aes(x = PERC_LANG_HOME_ENGLISH, y = PERC_UNEMPLOYED), colour = "grey20") +
+  geom_smooth(aes(x = PERC_LANG_HOME_ENGLISH, y = PERC_UNEMPLOYED)) +
+  ggtitle("Unemployment Rate vs Percent of English-Speaking Households") +
+  xlab("English-Speaking Households (%)") +
+  ylab("Unemployment Rate (%)") +
+  ylim(c(0,0.17)) +
+  theme(plot.title = element_text(face = "bold")) +
+  theme_bw()
 
 # There seems to be a slight relationship. The SA2's with the lowest % of people speaking English at home have the highest unemployment rates.
 

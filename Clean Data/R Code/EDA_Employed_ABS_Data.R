@@ -26,7 +26,9 @@ ggplot(nsw_data) +
 
 # What are the outliers
 nsw_data %>% 
-  filter(PERC_UNEMPLOYED > 0.2)
+  filter(PERC_UNEMPLOYED < 0.2) %>% 
+  filter(LAB_FORCE > 500) %>% 
+  arrange(desc(PERC_UNEMPLOYED))
 
 ## DATA DECISION - REMOVE these outliers
 nsw_data <- nsw_data %>% 
@@ -55,25 +57,33 @@ sa2_shape <- st_read("../../Raw Data/Data Files/ABS/SA2_Shapefile/SA2_2016_AUST.
 combined_df <- merge(nsw_data, sa2_shape, by.x = "SA2_CODE", by.y = "SA2_MAIN16")
 
 combined_df %>% 
-  filter(GCC_NAME16 == "Greater Sydney") %>% 
+  filter(GCC_NAME16 == "Greater Sydney",
+         SA4_NAME16 != "Central Coast",
+         SA3_NAME16 != "Blue Mountains",
+         SA3_NAME16 != "Hawkesbury") %>% 
+  #distinct(SA3_NAME16)
   ggplot() +
   geom_sf(aes(fill = PERC_UNEMPLOYED)) +
-  scale_fill_viridis("Percent Unemployed") +
-  theme_bw()
+  scale_fill_viridis("Unemployment Rate", limits = c(0, 0.159)) +
+  theme_bw() +
+  ggtitle("Greater Sydney Unemployment Rates") +
+  theme(plot.title = element_text(face = "bold"))
 
 combined_df %>% 
   filter()
   ggplot() +
   geom_sf(aes(fill = PERC_UNEMPLOYED)) +
-  scale_fill_viridis("Percent Unemployed") +
+  scale_fill_viridis("Unemployment Rate") +
   theme_bw()
   
 combined_df %>% 
   filter(SA2_NAME_2016 != "Lord Howe Island") %>% 
   ggplot() +
   geom_sf(aes(fill = PERC_UNEMPLOYED)) +
-  scale_fill_viridis("Percent Unemployed") +
-  theme_bw()
+  scale_fill_viridis("Unemployment Rate", limits = c(0, 0.159)) +
+  theme_bw() +
+  ggtitle("New South Wales Unemployment Rates") +
+  theme(plot.title = element_text(face = "bold"))
 
 # highest unemployment outside of Sydney
 combined_df %>% 

@@ -10,15 +10,14 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 # read cleaned data set
 eng_prof_data <- read_csv("../Data Files/ABS/English_Proficiency_SA2.csv")
 employed_data <- read_csv("../Data Files/ABS/Employed_SA2.csv")
-sa2_data <- read_csv("../../Raw Data/Data Files/ABS/Mesh_Blocks/MB_2016_NSW.csv")
+sa2_data <- read_csv("../Data Files/ABS/NSW_SA2_FOR_MODEL.csv")
 
-nsw_sa2 <- sa2_data %>% 
-  filter(STATE_NAME_2016 == "New South Wales") %>% 
-  distinct(SA2_MAINCODE_2016, SA2_NAME_2016)
+nsw_sa2 <- sa2_data
 
 # Get english proficiency data for NSW only
 nsw_ep_data <- eng_prof_data %>% 
   inner_join(nsw_sa2, by = c("SA2_CODE" = "SA2_MAINCODE_2016"))
+  
 
 glimpse(nsw_ep_data)
 
@@ -106,10 +105,15 @@ nsw_ep_data %>%
 # Correlation to unemployment
 nsw_ep_data %>% 
   inner_join(employed_data, by = c("SA2_CODE")) %>% 
-  filter(PERC_UNEMPLOYED < 0.2) %>% 
   ggplot() +
-  geom_point(aes(x = PERC_ENG_NOT_WELL, y = PERC_UNEMPLOYED)) +
-  geom_smooth(aes(x = PERC_ENG_NOT_WELL, y = PERC_UNEMPLOYED))
+  geom_point(aes(x = PERC_ENG_NOT_WELL, y = PERC_UNEMPLOYED), colour = "grey20") +
+  geom_smooth(aes(x = PERC_ENG_NOT_WELL, y = PERC_UNEMPLOYED)) +
+  xlab("Percent of Population with Poor English Proficiency") +
+  ylab("Unemployment Rate (%)") +
+  ggtitle("English Proficiency vs Unemployment Rate") +
+  ylim(c(0,0.17)) +
+  theme(plot.title = element_text(face = "bold")) +
+  theme_bw()
 
 # There may be a slight relationship
 # Where are these places were English is not spoken well?
