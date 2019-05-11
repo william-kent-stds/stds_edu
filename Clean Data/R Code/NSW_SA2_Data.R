@@ -1,5 +1,6 @@
 library(tidyverse)
 library(Amelia)
+library(sf)
 
 #getwd()
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -33,7 +34,12 @@ write_csv(clean_sa2, "../Data Files/ABS/NSW_SA2_FOR_MODEL.csv")
 # Percent of population in labour force looks normally distributed.
 clean_sa2 %>% 
   ggplot() +
-  geom_histogram(aes(x = PERC_LAB_FORCE), bins = 50)
+  geom_histogram(aes(x = PERC_LAB_FORCE), bins = 50) +
+  ggtitle("Distribution of SA2 population in the Labour Force") +
+  xlab("Total Labour Force (%)") +
+  ylab("Count of SA2's") +
+  theme(plot.title = element_text(face = "bold")) +
+  theme_bw()
 
 # Places close to Sydney have a high percent in the labour force
 clean_sa2 %>% 
@@ -45,3 +51,20 @@ clean_sa2 %>%
 
 # No missing data
 missmap(clean_sa2)
+
+sa2_shape <- st_read("../../Raw Data/Data Files/ABS/SA2_Shapefile/SA2_2016_AUST.shp", quiet = TRUE)
+combined_df <- merge(clean_sa2, sa2_shape, by.x = "SA2_MAINCODE_2016", by.y = "SA2_MAIN16")
+
+# For greater Sydney to start with
+combined_df %>% 
+  filter(GCC_NAME16 == "Greater Sydney",
+         SA4_NAME16 != "Central Coast",
+         SA3_NAME16 != "Blue Mountains",
+         SA3_NAME16 != "Hawkesbury") %>% 
+  #distinct(SA3_NAME16)
+  ggplot() +
+  geom_sf(aes(fill = PERC_LAB_FORCE)) +
+  scale_fill_viridis("Labour Force Participation", limits = c(0.29, 0.68)) +
+  theme_bw() +
+  ggtitle("Greater Sydney Labour Force Participation") +
+  theme(plot.title = element_text(face = "bold"))
