@@ -32,7 +32,7 @@ nsw_data %>%
 
 ## DATA DECISION - REMOVE these outliers
 nsw_data <- nsw_data %>% 
-  filter(PERC_UNEMPLOYED < 0.2)
+  filter(PERC_UNEMPLOYED < 0.2) 
 
 # What about the zero unemployment places
 nsw_data %>% 
