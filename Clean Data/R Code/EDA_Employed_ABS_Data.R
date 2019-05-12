@@ -4,6 +4,7 @@ library(corrplot)
 library(rgdal)
 library(sf)
 library(viridis)
+library(rgeos)
 
 
 #getwd()
@@ -89,3 +90,23 @@ combined_df %>%
 combined_df %>% 
   filter(GCC_NAME16 != "Greater Sydney") %>% 
   arrange(desc(PERC_UNEMPLOYED))
+
+
+
+## North/South divide analysis
+combined_df$centroid <- st_centroid(combined_df$geometry)
+a <- st_coordinates(st_geometry(combined_df$centroid))
+combined_df <- cbind(combined_df, a)
+
+combined_df %>% 
+  filter(GCC_NAME16 != "Greater Sydney") %>% 
+  mutate(STATE_REGION = case_when(Y < -33.8688 ~ "SOUTH",
+                   TRUE ~ "NORTH")) %>% 
+  group_by(STATE_REGION) %>% 
+  summarise(TOTAL_UNEMPLOYED = sum(UNEMPLOYED),
+            TOTAL_LAB_FORCE = sum(LAB_FORCE)) %>% 
+  mutate(UNEMPLOYMENT_RATE = TOTAL_UNEMPLOYED / TOTAL_LAB_FORCE)
+  
+
+
+combined_df
