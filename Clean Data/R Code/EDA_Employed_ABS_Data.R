@@ -4,8 +4,6 @@ library(corrplot)
 library(rgdal)
 library(sf)
 library(viridis)
-library(rgeos)
-
 
 #getwd()
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -106,7 +104,3 @@ combined_df %>%
   summarise(TOTAL_UNEMPLOYED = sum(UNEMPLOYED),
             TOTAL_LAB_FORCE = sum(LAB_FORCE)) %>% 
   mutate(UNEMPLOYMENT_RATE = TOTAL_UNEMPLOYED / TOTAL_LAB_FORCE)
-  
-
-
-combined_df

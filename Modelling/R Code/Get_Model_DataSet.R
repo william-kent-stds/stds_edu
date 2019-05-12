@@ -16,7 +16,7 @@ home_lang <- read_csv("../../Clean Data/Data Files/ABS/Language_at_Home_SA2.csv"
 education <- read_csv("../../Clean Data/Data Files/ABS/Education_SA2.csv")
 marriage <- read_csv("../../Clean Data/Data Files/ABS/Marriages_data.csv")
 
-glimpse(marriage)
+glimpse(hh_composition)
 # Get mesh block data at SA2 level
 nsw_sa2 <- read_csv("../../Clean Data/Data Files/ABS/NSW_SA2_FOR_MODEL.csv")
 
@@ -64,7 +64,9 @@ model_data <- nsw_sa2 %>%
          ,SEPARATED_MOD
          ,DIVORCED_MOD
          ,MARRIED_MOD
-         ,WIDOWED_MOD)
+         ,WIDOWED_MOD
+         ,PERC_HHOLD_SIZE_OVER_5
+         ,PERC_HHOLD_NON_FAM)
 
 # Check correlations
 model_matrix <- model_data %>% 
