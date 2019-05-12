@@ -48,7 +48,8 @@ clean_data_1 <- working_data %>%
 clean_data <- clean_data_0 %>%
   inner_join(clean_data_1, by = c("SA2_CODE")) %>% 
   mutate(PERC_ENG_ONLY = ENG_ONLY / (ENG_NOT_WELL + ENG_ONLY + ENG_UNKNOWN + ENG_V_WELL + ENG_WELL),
-         PERC_ENG_NOT_WELL = ENG_NOT_WELL / (ENG_NOT_WELL + ENG_ONLY + ENG_UNKNOWN + ENG_V_WELL + ENG_WELL))
+         PERC_ENG_NOT_WELL = ENG_NOT_WELL / (ENG_NOT_WELL + ENG_ONLY + ENG_UNKNOWN + ENG_V_WELL + ENG_WELL),
+         ENG_PROFICIENT = ENG_ONLY + ENG_V_WELL + ENG_WELL)
 
 #glimpse(clean_data)
 # Write cleaned data set to csv
