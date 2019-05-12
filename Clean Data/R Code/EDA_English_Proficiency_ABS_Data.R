@@ -145,3 +145,15 @@ rcorr(nsw_ep_matrix, type = "pearson")
 corrplot(cor(nsw_ep_matrix), method = "ellipse")
 
 # It's interesting that English Not Well, English Well and English Very Well are all reasonably strongly correlated. Migrants with family.
+
+nsw_ep_data %>% 
+  inner_join(employed_data, by = c("SA2_CODE")) %>% 
+  ggplot() +
+  geom_point(aes(x = 1 - PERC_ENG_NOT_WELL, y = PERC_UNEMPLOYED), colour = "grey20") +
+  geom_smooth(aes(x = 1 - PERC_ENG_NOT_WELL, y = PERC_UNEMPLOYED)) +
+  xlab("Percent of Population English Proficient") +
+  ylab("Unemployment Rate (%)") +
+  ggtitle("English Proficiency vs Unemployment Rate") +
+  ylim(c(0,0.17)) +
+  theme(plot.title = element_text(face = "bold")) +
+  theme_bw()

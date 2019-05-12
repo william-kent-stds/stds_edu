@@ -1,0 +1,145 @@
+---
+title: "EDA on ERP and Household Composition"
+author: "Htet Naing Aung"
+date: "10/05/2019"
+output: 
+  bookdown::html_document2:
+    number_sections: false
+    df_print: paged
+    theme: flatly
+    highlight: tango
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, include=FALSE}
+library(tidyverse)
+library(janitor)
+library(skimr)
+library(sf)
+library(viridis)
+```
+# About
+This page is about exploratory data anlysis on estimated resident population, household, and
+employment specifically in NSW region at SA2 level. 
+
+# Estimated Resident Population
+
+The raw ERP dataset has 20808 observations and 17 variables. 
+And about 6 variables provide useful information: `sex`, `age`, `sa2_code`, `region`, `time`, and `value`.
+
+```{r}
+(erp <- read_csv(
+  "../../Raw Data/Data Files/ABS/ERP/ABS_ERP_ASGS2016_25042019132433480.csv"
+))
+```
+## Population by Age and Sex
+As seen in Figure \@ref(fig:fig-pop-age-sex), both genders have a similar distribution with
+the age ranges 25-29 and 30-34 at the peak. The population starts to decline in ages larger than
+50. Over 85-year olds, the population of women is about twice as large as that of men.
+```{r fig-pop-age-sex, fig.align="center", fig.cap="Population in NSW by Age and Sex"}
+erp <- erp %>% 
+  select(-c("MEASURE", "Measure", "SEX_ABS", "AGE", "FREQUENCY", "Frequency", 
+            "TIME", "Flag Codes", "Flags", "REGIONTYPE", "Geography Level")) %>% 
+  rename(sa2_code = ASGS_2016) %>% 
+  clean_names()
+erp$age <- factor(erp$age, levels = erp$age, labels = erp$age)
+
+erp %>% 
+  mutate(value = ifelse(sex == "Males", -1 * value, value)) %>% 
+  ggplot(mapping = aes(x = age, y = value, fill = sex)) +
+  geom_bar(stat = "identity", width = .85) +
+  scale_y_continuous(labels = c('300k', '200k', '100k', '0', '100k', '200k', '300k')) +
+  labs(x = "Age band", y = "Population", fill = "Sex", 
+       title = "Population in NSW by Age and Sex") +
+  coord_flip() +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = .5, face = "bold", size = 14),
+        text = element_text(family = "Avenir", size = 12)) +
+  scale_fill_manual(values = c("#1F988B", "#37598C"))
+```
+
+## Population Density across NSW
+
+```{r fig-pop-density-greater-sydney, fig.align="center", fig.cap="Population Density across Greater Sydney", cache=TRUE}
+erp_by_sa2 <- erp %>% group_by(sa2_code) %>% summarise(pop = sum(value))
+total_pop <- sum(erp_by_sa2$pop)
+erp_by_sa2 <- erp_by_sa2 %>% mutate(perc = pop / total_pop)
+
+sa2_shape <- st_read("../../Raw Data/Data Files/ABS/SA2_Shapefile/SA2_2016_AUST.shp", quiet = TRUE)
+combined_df <- merge(erp_by_sa2, sa2_shape, by.x = "sa2_code", by.y = "SA2_MAIN16")
+
+combined_df %>% 
+  filter(GCC_NAME16 == "Greater Sydney") %>% 
+  ggplot() +
+  geom_sf(mapping = aes(fill = pop)) +
+  scale_fill_viridis("Population") +
+  theme_bw()
+```
+
+```{r fig-pop-density-nsw, fig.align="center", fig.cap="Population Density across NSW", cache=TRUE}
+combined_df %>% 
+  filter(SA2_NAME16 != "Lord Howe Island") %>% 
+  ggplot() +
+  geom_sf(mapping = aes(fill = pop)) +
+  scale_fill_viridis("Population") +
+  theme_bw()
+```
+
+# Household Composition
+
+```{r, include=FALSE}
+mesh_block <- read_csv("../../Raw Data/Data Files/ABS/Mesh_Blocks/MB_2016_NSW.csv")
+nsw_sa2_codes <- mesh_block %>% 
+  filter(STATE_NAME_2016 == "New South Wales") %>% 
+  rename(sa2_code = SA2_MAINCODE_2016, region = SA2_NAME_2016) %>% 
+  distinct(sa2_code, region)
+
+household <- read_csv("../Data Files/ABS/HouseHold_Composition_SA2.csv") %>% 
+  clean_names() %>% 
+  inner_join(nsw_sa2_codes)
+
+employed <- read_csv("../Data Files/ABS/Employed_SA2.csv") %>% clean_names()
+```
+
+In the box plot, half of the SA2 regions have:
+
+- around 3,000 to 7,000 population from 1-2 household size
+- about 2,000 to 5,000 population from 3-5 household size, and
+- around 150 to 500 from household size of over 5 people.
+
+```{r household-size-distribution, fig.align="center", fig.cap="Distribution of HouseHold Sizes Across SA2 Regions"}
+employed_household <- household %>% 
+  left_join(employed, by = "sa2_code") %>% 
+  na.omit() %>% 
+  filter(hhold_fam_one + hhold_fam_multi + hhold_non_fam > 500)
+
+employed_household %>% 
+  gather(key = household_size_range, 
+         value = household_size_value,
+         c(hhold_size_1_2:hhold_size_over_5)) %>% 
+  ggplot(mapping = aes(x = household_size_range, y = household_size_value)) +
+    geom_boxplot() +
+    scale_x_discrete(labels = c("1-2 people", "3-5 people", "Over 5 people")) +
+    labs(x = "House Hold Size", y = "Population",
+         title = "Distribution of House Hold Sizes Across SA2 Regions") +
+    theme(plot.title = element_text(hjust = .5, face = "bold", size = 16),
+          axis.ticks = element_blank(),
+          text = element_text(family = "Avenir", size = 12))
+```
+
+There seems to be a little correlation between the unemployment rate and the percentage of over 5 people in house.
+```{r household-unemployment, fig.align="center", fig.cap="Unemployment Percentage vs Percentage of over 5 People in House"}
+
+ggplot(data = employed_household, mapping = aes(x = perc_hhold_size_over_5, y = perc_unemployed)) +
+  geom_point() +
+  geom_smooth(se = FALSE, method = "loess", formula = "y ~ x") +
+  labs(x = "Percentage of over 5 People in House", y = "Unemployment Percentage",
+       title = "Unemployment Percentage vs Percentage of over 5 People in House") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = .5, face = "bold", size = 14),
+        text = element_text(family = "Avenir", size = 12))
+```
