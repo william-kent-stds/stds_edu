@@ -198,10 +198,13 @@ employed_household %>%
          value = household_size_value,
          c(hhold_size_1_2:hhold_size_over_5)) %>% 
   ggplot(mapping = aes(x = household_size_range, y = household_size_value)) +
-    geom_boxplot() +
+    # geom_boxplot(fill = ("")) +
+    geom_bar(stat = "identity", fill = "#37598C") +
     scale_x_discrete(labels = c("1-2 people", "3-5 people", "Over 5 people")) +
+    scale_y_continuous(labels = c("0", "1 million", "2 million", "3 million")) +
     labs(x = "House Hold Size", y = "Population",
-         title = "Distribution of House Hold Sizes Across SA2 Regions") +
+         title = "Population across Different Household Sizes") +
+    theme_bw() +
     theme(plot.title = element_text(hjust = .5, face = "bold", size = 16),
           axis.ticks = element_blank(),
           text = element_text(size = 14))
@@ -217,12 +220,18 @@ unemployed_hh_3_5 <- ggplot(data = employed_household, mapping = aes(x = perc_hh
   geom_smooth(se = FALSE) +
   labs(x = "Percentage of 3-5 People in House (%)", y = "Percentage of Unemployed (%)") +
   theme(text = element_text(size = 14))
-unemployed_hh_over_5 <- ggplot(data = employed_household, mapping = aes(x = perc_hhold_size_over_5, y = perc_unemployed)) +
-  geom_point() +
-  geom_smooth(se = FALSE) +
-  labs(x = "Percentage of over 5 People in House (%)", y = "Percentage of Unemployed (%)") +
-  theme(text = element_text(size = 14))
+
+ggplot(data = employed_household, mapping = aes(x = perc_hhold_size_over_5, y = perc_unemployed)) +
+  geom_point(color = "#37598C") +
+  geom_smooth(se = FALSE, color = "#FF8552") +
+  labs(x = "Percentage of over 5 People in House (%)", y = "Percentage of Unemployed (%)",
+       title = "Rate of Unemployment vs Proportion of Over 5 people in House") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = .5, face = "bold", size = 16),
+        text = element_text(size = 14))
 
 grid.arrange(unemployed_hh_1_2, unemployed_hh_3_5, unemployed_hh_over_5, 
              top = textGrob("Rate of Unemployment vs Proportion of People in House",
                             gp = gpar(fontsize = 16, fontface = "bold")))
+
+unemployed_hh_over_5
