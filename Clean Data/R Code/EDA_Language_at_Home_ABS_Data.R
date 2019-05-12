@@ -125,3 +125,15 @@ corrplot(cor(nsw_lah_matrix), method = "ellipse")
 # Southern and Eastern Europeans also seem to hang out together.
 # I find the slightly negative correlation between indgenous languages and non-English languages interesting. Do new migrants not get an understanding
 # of aboriginal life and culture?
+
+
+nsw_lah_data %>% 
+  inner_join(sa2, by = c("SA2_CODE" = "SA2_MAINCODE_2016")) %>% 
+  inner_join(employed, by = "SA2_CODE") %>% 
+  ggplot() +
+  geom_hex(aes(x = PERC_LANG_HOME_ENGLISH, y = PERC_UNEMPLOYED), bins = 50, colour = "white") +
+  scale_fill_gradient(low =  "#00AFBB", high = "#FC4E07") +
+  stat_smooth(aes(x = PERC_LANG_HOME_ENGLISH, y = PERC_UNEMPLOYED), level = 0, colour = "#bb0300", size = 2) +
+  theme_bw()
+
+?geom_hex
