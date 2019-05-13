@@ -224,7 +224,9 @@ unemployed_hh_3_5 <- ggplot(data = employed_household, mapping = aes(x = perc_hh
 ggplot(data = employed_household, mapping = aes(x = perc_hhold_size_over_5, y = perc_unemployed)) +
   geom_point(color = "#37598C") +
   geom_smooth(se = FALSE, color = "#FF8552") +
-  labs(x = "Percentage of over 5 People in House (%)", y = "Percentage of Unemployed (%)",
+  scale_x_continuous(labels = scales::percent) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x = "Percentage of over 5 People in House", y = "Percentage of Unemployed",
        title = "Rate of Unemployment vs Proportion of Over 5 people in House") +
   theme_bw() +
   theme(plot.title = element_text(hjust = .5, face = "bold", size = 16),
