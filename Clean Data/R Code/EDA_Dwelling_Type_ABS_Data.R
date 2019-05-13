@@ -7,15 +7,11 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 # read cleaned data set
 dwelling_type <- read_csv("../Data Files/ABS/Dwelling_Type_SA2.csv")
-mesh_blocks <- read_csv("../../Raw Data/Data Files/ABS/Mesh_Blocks/MB_2016_NSW.csv")
-str(mesh_blocks)
-
-# Get mesh block data at SA2 level
-sa2_data <- mesh_blocks %>% 
-  distinct(SA2_MAINCODE_2016, SA2_NAME_2016, STATE_CODE_2016, STATE_NAME_2016)
+sa2 <- read_csv("../Data Files/ABS/NSW_SA2_FOR_MODEL.csv")
+employed <- read_csv("../Data Files/ABS/Employed_SA2.csv")
 
 # No duplicate SA2 Codes
-sa2_data %>% 
+sa2 %>% 
   group_by(SA2_MAINCODE_2016) %>% 
   summarise(cnt = n()) %>% 
   filter(cnt > 1)
@@ -28,11 +24,8 @@ dwelling_type %>%
 
 # 62 SA2's have no dwellings - 7 in NSW, a military base, centennial park, a NP, a cemetry, and Industrial area, Banksmeadow is whaves and industry
 dwelling_type %>% 
-  mutate(TOTAL= DWELLING_HOUSE + DWELLING_FLAT + DWELLING_SEMI + DWELLING_OTHER) %>% 
-  filter(TOTAL == 0) %>% 
-  left_join(sa2_data, by = c("SA2_CODE" = "SA2_MAINCODE_2016")) %>% 
-  select(SA2_CODE, TOTAL, SA2_NAME_2016, STATE_NAME_2016) %>% 
-  filter(between(SA2_CODE,100000000,200000000))
+  inner_join(sa2, by = c("SA2_CODE" = "SA2_MAINCODE_2016")) %>% 
+  mutate(TOTAL= DWELLING_HOUSE + DWELLING_FLAT + DWELLING_SEMI + DWELLING_OTHER)
 
 # There are a couple of areas with high numbers of dwellings - Waterloo/Beaconsfield in NSW is high density
 dwelling_type %>% 
@@ -101,3 +94,10 @@ rcorr(dwelling_matrix, type = "pearson")
 
 # And a plot for good measure
 corrplot(cor(dwelling_matrix), method = "ellipse")
+
+# Have a quick check of the Unemployment and Dwelling Type
+dwelling_type %>% 
+  inner_join(sa2, by = c("SA2_CODE" = "SA2_MAINCODE_2016")) %>% 
+  inner_join(employed, by = "SA2_CODE") %>% 
+  ggplot() +
+  geom_point(aes(x = PERC_DWELLING_HOUSE, y = PERC_UNEMPLOYED))
