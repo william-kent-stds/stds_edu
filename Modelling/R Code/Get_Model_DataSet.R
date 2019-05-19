@@ -20,8 +20,9 @@ arrival_year <- read_csv("../../Clean Data/Data Files/ABS/Arrival_Year_SA2.csv")
 demographics <- read_csv("../../Clean Data/Data Files/ABS/ERP_SA2_2016.csv")
 indigenous <- read_csv("../../Clean Data/Data Files/ABS/Indigenous_Population_SA2.csv")
 open_space <- read_csv("../../Clean Data/Data Files/ABS/Open_Space_SA2.csv")
+commute <- read_csv("../../Clean Data/Data Files/ABS/Commute data.csv")
 
-glimpse(open_space)
+glimpse(commute)
 # Get NSW SA2 Data
 nsw_sa2 <- read_csv("../../Clean Data/Data Files/ABS/NSW_SA2_FOR_MODEL.csv")
 
@@ -41,6 +42,7 @@ model_data <- nsw_sa2 %>%
   left_join(demographics, by = c("SA2_MAINCODE_2016" = "sa2_code")) %>% 
   left_join(indigenous, by = c("SA2_MAINCODE_2016" = "SA2_CODE")) %>% 
   left_join(open_space, by = c("SA2_MAINCODE_2016" = "SA2_CODE")) %>% 
+  left_join(commute, by = c("SA2_MAINCODE_2016" = "SA2 Code (2016)")) %>% 
   mutate(BORN_OVERSEAS_MOD = BORN_OVERSEAS * PERC_LAB_FORCE,
          ENG_PROFICIENT_MOD = ENG_PROFICIENT * PERC_LAB_FORCE,
          LANG_HOME_ENGLISH_MOD = LANG_HOME_ENGLISH * PERC_LAB_FORCE,
@@ -60,7 +62,17 @@ model_data <- nsw_sa2 %>%
          ARRIVAL_LAST_20 = `0-20 year` * PERC_LAB_FORCE,
          ARRIVAL_20_50 = `20-50 years` * PERC_LAB_FORCE,
          ARRIVAL_OVER_50 = `50+ years` * PERC_LAB_FORCE,
-         INDIG_POP = total_indigenous_population * PERC_LAB_FORCE) %>% 
+         INDIG_POP = total_indigenous_population * PERC_LAB_FORCE,
+         COMMUTE_MED_DIST = coalesce(as.numeric(`Median commuting distance to work from place of usual residence`),0),
+         COMUTE_AVG_DIST = coalesce(as.numeric(`Average commuting distance from usual place of residence`),0),
+         COMMUTE_CAR = coalesce(as.numeric(`Method of travel to work - car (as passenger or driver)`),0),
+         COMMUTE_WALK = coalesce(as.numeric(`Method of travel to work - walking`),0),
+         COMMUTE_BUS = coalesce(as.numeric(`Method of travel to work - bus`),0),
+         COMMUTE_MOTORBIKE = coalesce(as.numeric(`Method of travel to work - motor bike/scooter`),0),
+         COMMUTE_TRAIN = coalesce(as.numeric(`Method of travel to work - train`),0),
+         COMMUTE_BIKE = coalesce(as.numeric(`Method of travel to work - bike`),0),
+         COMMUTE_OTHER = coalesce(as.numeric(`Method of travel to work - other (inc taxis)`),0),
+         COMMUTE_PUBLIC_TRANS = coalesce(as.numeric(`Method of travel to work - bus`),0) + coalesce(as.numeric(`Method of travel to work - train`),0)) %>% 
   dplyr::select(SA2_CODE = SA2_MAINCODE_2016
          ,SA2_NAME = SA2_NAME_2016
          ,IS_SYDNEY
@@ -97,13 +109,29 @@ model_data <- nsw_sa2 %>%
          ,ARRIVAL_20_50
          ,ARRIVAL_OVER_50
          ,INDIG_POP
-         ,PERC_OPEN_SPACE)
+         ,PERC_OPEN_SPACE
+         ,COMMUTE_MED_DIST
+         ,COMUTE_AVG_DIST
+         ,COMMUTE_CAR
+         ,COMMUTE_WALK
+         ,COMMUTE_BUS
+         ,COMMUTE_MOTORBIKE
+         ,COMMUTE_TRAIN
+         ,COMMUTE_BIKE
+         ,COMMUTE_OTHER
+         ,COMMUTE_PUBLIC_TRANS)
 
+
+glimpse(model_data)
 # Check correlations
 model_matrix <- model_data %>% 
-  select(LAB_FORCE,UNEMPLOYED,PERC_DWELLING_FLAT,PERC_DWELLING_HOUSE,PERC_DWELLING_SEMI,PERC_DWELLING_OTHER,BORN_OVERSEAS_MOD,SEIFA_Edu_Occ_Index
-         ,SEIFA_Economic_Res_Index,SEIFA_Rel_SocioEco_Adv_Disadv_Index,SEIFA_Rel_SocioEco_Disadv_Index,ENG_PROFICIENT_MOD
-         ,LANG_HOME_ENGLISH_MOD) %>% 
+  select(IS_SYDNEY,IS_SUA,LAB_FORCE,UNEMPLOYED,PERC_DWELLING_FLAT,PERC_DWELLING_HOUSE,PERC_DWELLING_SEMI,PERC_DWELLING_OTHER
+         ,BORN_OVERSEAS_MOD,SEIFA_Edu_Occ_Index,SEIFA_Economic_Res_Index,SEIFA_Rel_SocioEco_Adv_Disadv_Index
+         ,SEIFA_Rel_SocioEco_Disadv_Index,ENG_PROFICIENT_MOD,LANG_HOME_ENGLISH_MOD,EDU_BACHELOR_MOD,EDU_POSTGRAD_MOD
+         ,EDU_CERTIFICATE_MOD,EDU_DIPLOMA_MOD,SEPARATED_MOD,DIVORCED_MOD,MARRIED_MOD,WIDOWED_MOD,PERC_HHOLD_SIZE_OVER_5
+         ,PERC_HHOLD_NON_FAM,MALES,FEMALES,ANCESTRY_BOTH_AUST,ANCESTRY_ONE_OS,ANCESTRY_BOTH_OS,ARRIVAL_LAST_20,ARRIVAL_20_50
+         ,ARRIVAL_OVER_50,INDIG_POP,PERC_OPEN_SPACE,COMMUTE_MED_DIST,COMUTE_AVG_DIST,COMMUTE_CAR,COMMUTE_WALK,COMMUTE_BUS
+         ,COMMUTE_MOTORBIKE,COMMUTE_TRAIN,COMMUTE_BIKE,COMMUTE_OTHER,COMMUTE_PUBLIC_TRANS) %>% 
   as.matrix()
 
 rcorr(model_matrix, type = "pearson")
