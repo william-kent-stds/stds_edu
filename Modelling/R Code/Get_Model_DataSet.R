@@ -15,9 +15,14 @@ eng_proficiency <- read_csv("../../Clean Data/Data Files/ABS/English_Proficiency
 home_lang <- read_csv("../../Clean Data/Data Files/ABS/Language_at_Home_SA2.csv")
 education <- read_csv("../../Clean Data/Data Files/ABS/Education_SA2.csv")
 marriage <- read_csv("../../Clean Data/Data Files/ABS/Marriages_data.csv")
+ancestry <- read_csv("../../Clean Data/Data Files/ABS/Ancestry_SA2.csv")
+arrival_year <- read_csv("../../Clean Data/Data Files/ABS/Arrival_Year_SA2.csv")
+demographics <- read_csv("../../Clean Data/Data Files/ABS/ERP_SA2_2016.csv")
+indigenous <- read_csv("../../Clean Data/Data Files/ABS/Indigenous_Population_SA2.csv")
+open_space <- read_csv("../../Clean Data/Data Files/ABS/Open_Space_SA2.csv")
 
-glimpse(hh_composition)
-# Get mesh block data at SA2 level
+glimpse(open_space)
+# Get NSW SA2 Data
 nsw_sa2 <- read_csv("../../Clean Data/Data Files/ABS/NSW_SA2_FOR_MODEL.csv")
 
 # Join Datasets together
@@ -31,6 +36,11 @@ model_data <- nsw_sa2 %>%
   left_join(home_lang, by = c("SA2_MAINCODE_2016" = "SA2_CODE")) %>% 
   left_join(education, by = c("SA2_MAINCODE_2016" = "SA2_CODE")) %>% 
   left_join(marriage, by = c("SA2_MAINCODE_2016" = "SA2 Code (2016)")) %>% 
+  left_join(ancestry, by = c("SA2_MAINCODE_2016" = "SA2_CODE")) %>% 
+  left_join(arrival_year, by = c("SA2_MAINCODE_2016" = "SA2_CODE")) %>% 
+  left_join(demographics, by = c("SA2_MAINCODE_2016" = "sa2_code")) %>% 
+  left_join(indigenous, by = c("SA2_MAINCODE_2016" = "SA2_CODE")) %>% 
+  left_join(open_space, by = c("SA2_MAINCODE_2016" = "SA2_CODE")) %>% 
   mutate(BORN_OVERSEAS_MOD = BORN_OVERSEAS * PERC_LAB_FORCE,
          ENG_PROFICIENT_MOD = ENG_PROFICIENT * PERC_LAB_FORCE,
          LANG_HOME_ENGLISH_MOD = LANG_HOME_ENGLISH * PERC_LAB_FORCE,
@@ -41,7 +51,16 @@ model_data <- nsw_sa2 %>%
          SEPARATED_MOD = `Persons Total Separated` * PERC_LAB_FORCE,
          DIVORCED_MOD = `Persons Total Divorced` * PERC_LAB_FORCE,
          MARRIED_MOD = `Persons Total Married` * PERC_LAB_FORCE,
-         WIDOWED_MOD = `Persons Total Widowed`* PERC_LAB_FORCE) %>% 
+         WIDOWED_MOD = `Persons Total Widowed` * PERC_LAB_FORCE,
+         MALES = males * PERC_LAB_FORCE,
+         FEMALES = females * PERC_LAB_FORCE,
+         ANCESTRY_BOTH_AUST = Both_Parents_Born_Australia * PERC_LAB_FORCE,
+         ANCESTRY_ONE_OS = One_Parent_Born_Overseas * PERC_LAB_FORCE,
+         ANCESTRY_BOTH_OS = Both_Parents_Born_Overseas * PERC_LAB_FORCE,
+         ARRIVAL_LAST_20 = `0-20 year` * PERC_LAB_FORCE,
+         ARRIVAL_20_50 = `20-50 years` * PERC_LAB_FORCE,
+         ARRIVAL_OVER_50 = `50+ years` * PERC_LAB_FORCE,
+         INDIG_POP = total_indigenous_population * PERC_LAB_FORCE) %>% 
   dplyr::select(SA2_CODE = SA2_MAINCODE_2016
          ,SA2_NAME = SA2_NAME_2016
          ,IS_SYDNEY
@@ -68,7 +87,17 @@ model_data <- nsw_sa2 %>%
          ,MARRIED_MOD
          ,WIDOWED_MOD
          ,PERC_HHOLD_SIZE_OVER_5
-         ,PERC_HHOLD_NON_FAM)
+         ,PERC_HHOLD_NON_FAM
+         ,MALES
+         ,FEMALES
+         ,ANCESTRY_BOTH_AUST
+         ,ANCESTRY_ONE_OS
+         ,ANCESTRY_BOTH_OS
+         ,ARRIVAL_LAST_20
+         ,ARRIVAL_20_50
+         ,ARRIVAL_OVER_50
+         ,INDIG_POP
+         ,PERC_OPEN_SPACE)
 
 # Check correlations
 model_matrix <- model_data %>% 
