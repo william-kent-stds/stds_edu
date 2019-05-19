@@ -7,14 +7,18 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 # Get mesh block data
 sa2_data <- read_csv("../../Raw Data/Data Files/ABS/Mesh_Blocks/MB_2016_NSW.csv")
+sua_data <- read_csv("../../Raw Data/Data Files/ABS/SA2_SUA_2016_AUST.csv")
 
 glimpse(sa2_data)
+sa2_data %>% 
+  distinct(SA4_NAME_2016)
 
 # Get New South Wales SA2's, and remove the "No usual address" entry
 sa2_data <- sa2_data %>%
   filter(STATE_NAME_2016 == "New South Wales") %>% 
-  distinct(SA2_MAINCODE_2016, SA2_NAME_2016, STATE_NAME_2016) %>% 
-  filter(SA2_NAME_2016 != "No usual address (NSW)")
+  inner_join(sua_data, by = c("SA2_MAINCODE_2016")) %>% 
+  distinct(SA2_MAINCODE_2016, SA2_NAME_2016.x, STATE_NAME_2016, GCCSA_NAME_2016, SUA_NAME_2016) %>% 
+  filter(SA2_NAME_2016.x != "No usual address (NSW)")
 
 # Get Population and Employment data 
 erp_data <- read_csv("../Data Files/ABS/ERP_SA2_2016.csv")
@@ -25,8 +29,12 @@ clean_sa2 <- sa2_data %>%
   inner_join(erp_data, by = c("SA2_MAINCODE_2016" = "sa2_code")) %>% 
   inner_join(employ_data, by = c("SA2_MAINCODE_2016" = "SA2_CODE")) %>% 
   mutate(TOTAL_POP = females + males,
-         PERC_LAB_FORCE = LAB_FORCE / (females + males)) %>% 
-  select(SA2_MAINCODE_2016, SA2_NAME_2016, TOTAL_POP, LAB_FORCE, PERC_LAB_FORCE) %>% 
+         PERC_LAB_FORCE = LAB_FORCE / (females + males),
+         IS_SYDNEY = case_when(GCCSA_NAME_2016 == "Rest of NSW" ~ 0,
+                              TRUE ~ 1),
+         IS_SUA = case_when(SUA_NAME_2016 == "Not in any Significant Urban Area (NSW)" ~ 0,
+                            TRUE ~ 1)) %>% 
+  select(SA2_MAINCODE_2016, SA2_NAME_2016 = SA2_NAME_2016.x, IS_SYDNEY, IS_SUA, TOTAL_POP, LAB_FORCE, PERC_LAB_FORCE) %>% 
   filter(TOTAL_POP > 500)
 
 write_csv(clean_sa2, "../Data Files/ABS/NSW_SA2_FOR_MODEL.csv")
