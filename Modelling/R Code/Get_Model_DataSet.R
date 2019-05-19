@@ -35,7 +35,7 @@ model_data <- nsw_sa2 %>%
          ENG_PROFICIENT_MOD = ENG_PROFICIENT * PERC_LAB_FORCE,
          LANG_HOME_ENGLISH_MOD = LANG_HOME_ENGLISH * PERC_LAB_FORCE,
          EDU_BACHELOR_MOD = EDU_BACHELOR * PERC_LAB_FORCE,
-         EDU_CERTIFICATE_MOD = EDU_CERTIFICATE * PERC_LAB_FORCE,
+         EDU_CERTIFICATE_MOD = EDU_CERT_ALL * PERC_LAB_FORCE,
          EDU_DIPLOMA_MOD = EDU_DIPLOMA * PERC_LAB_FORCE,
          EDU_POSTGRAD_MOD = EDU_POSTGRAD * PERC_LAB_FORCE,
          SEPARATED_MOD = `Persons Total Separated` * PERC_LAB_FORCE,
@@ -44,6 +44,8 @@ model_data <- nsw_sa2 %>%
          WIDOWED_MOD = `Persons Total Widowed`* PERC_LAB_FORCE) %>% 
   dplyr::select(SA2_CODE = SA2_MAINCODE_2016
          ,SA2_NAME = SA2_NAME_2016
+         ,IS_SYDNEY
+         ,IS_SUA
          ,LAB_FORCE = LAB_FORCE.x
          ,UNEMPLOYED
          ,PERC_DWELLING_FLAT
