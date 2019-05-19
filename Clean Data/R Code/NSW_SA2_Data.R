@@ -76,3 +76,14 @@ combined_df %>%
   theme_bw() +
   ggtitle("Greater Sydney Labour Force Participation") +
   theme(plot.title = element_text(face = "bold"))
+
+
+# Exclude
+clean_sa2 %>% 
+  ggplot() +
+  geom_histogram(aes(x = TOTAL_POP), bins = 50) +
+  ggtitle("Number of NSW SA2's by Total Population") +
+  xlab("Total population of SA2") +
+  ylab("Count") +
+  theme_bw()
+  
