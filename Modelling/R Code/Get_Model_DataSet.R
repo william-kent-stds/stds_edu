@@ -64,7 +64,7 @@ model_data <- nsw_sa2 %>%
          ARRIVAL_OVER_50 = `50+ years` * PERC_LAB_FORCE,
          INDIG_POP = total_indigenous_population * PERC_LAB_FORCE,
          COMMUTE_MED_DIST = coalesce(as.numeric(`Median commuting distance to work from place of usual residence`),0),
-         COMUTE_AVG_DIST = coalesce(as.numeric(`Average commuting distance from usual place of residence`),0),
+         COMMUTE_AVG_DIST = coalesce(as.numeric(`Average commuting distance from usual place of residence`),0),
          COMMUTE_CAR = coalesce(as.numeric(`Method of travel to work - car (as passenger or driver)`),0),
          COMMUTE_WALK = coalesce(as.numeric(`Method of travel to work - walking`),0),
          COMMUTE_BUS = coalesce(as.numeric(`Method of travel to work - bus`),0),
@@ -111,7 +111,7 @@ model_data <- nsw_sa2 %>%
          ,INDIG_POP
          ,PERC_OPEN_SPACE
          ,COMMUTE_MED_DIST
-         ,COMUTE_AVG_DIST
+         ,COMMUTE_AVG_DIST
          ,COMMUTE_CAR
          ,COMMUTE_WALK
          ,COMMUTE_BUS
