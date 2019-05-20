@@ -21,6 +21,7 @@ demographics <- read_csv("../../Clean Data/Data Files/ABS/ERP_SA2_2016.csv")
 indigenous <- read_csv("../../Clean Data/Data Files/ABS/Indigenous_Population_SA2.csv")
 open_space <- read_csv("../../Clean Data/Data Files/ABS/Open_Space_SA2.csv")
 commute <- read_csv("../../Clean Data/Data Files/ABS/Commute data.csv")
+north_south <- read_csv("../../Clean Data/Data Files/ABS/State_North_South.csv")
 
 # Get NSW SA2 Data
 nsw_sa2 <- read_csv("../../Clean Data/Data Files/ABS/NSW_SA2_FOR_MODEL.csv")
@@ -42,6 +43,7 @@ model_data <- nsw_sa2 %>%
   left_join(indigenous, by = c("SA2_MAINCODE_2016" = "SA2_CODE")) %>% 
   left_join(open_space, by = c("SA2_MAINCODE_2016" = "SA2_CODE")) %>% 
   left_join(commute, by = c("SA2_MAINCODE_2016" = "SA2 Code (2016)")) %>% 
+  left_join(north_south, by = c("SA2_MAINCODE_2016" = "SA2_CODE")) %>% 
   mutate(BORN_OVERSEAS_MOD = BORN_OVERSEAS * PERC_LAB_FORCE,
          ENG_PROFICIENT_MOD = ENG_PROFICIENT * PERC_LAB_FORCE,
          LANG_HOME_ENGLISH_MOD = LANG_HOME_ENGLISH * PERC_LAB_FORCE,
@@ -70,11 +72,14 @@ model_data <- nsw_sa2 %>%
          COMMUTE_TRAIN = coalesce(as.numeric(`Method of travel to work - train`),0),
          COMMUTE_BIKE = coalesce(as.numeric(`Method of travel to work - bike`),0),
          COMMUTE_OTHER = coalesce(as.numeric(`Method of travel to work - other (inc taxis)`),0),
-         COMMUTE_PUBLIC_TRANS = coalesce(as.numeric(`Method of travel to work - bus`),0) + coalesce(as.numeric(`Method of travel to work - train`),0)) %>% 
+         COMMUTE_PUBLIC_TRANS = coalesce(as.numeric(`Method of travel to work - bus`),0) + coalesce(as.numeric(`Method of travel to work - train`),0),
+         IS_NORTH_NSW = case_when(STATE_REGION == "NORTH" ~ 1, TRUE ~ 0)
+         ) %>% 
   dplyr::select(SA2_CODE = SA2_MAINCODE_2016
          ,SA2_NAME = SA2_NAME_2016
          ,IS_SYDNEY
          ,IS_SUA
+         ,IS_NORTH_NSW
          ,TOTAL_POP
          ,LAB_FORCE = LAB_FORCE.x
          ,UNEMPLOYED

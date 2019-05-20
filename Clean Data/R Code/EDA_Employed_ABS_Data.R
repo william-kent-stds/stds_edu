@@ -108,3 +108,13 @@ combined_df %>%
   summarise(TOTAL_UNEMPLOYED = sum(UNEMPLOYED),
             TOTAL_LAB_FORCE = sum(LAB_FORCE)) %>% 
   mutate(UNEMPLOYMENT_RATE = TOTAL_UNEMPLOYED / TOTAL_LAB_FORCE)
+
+
+state_region <- combined_df %>% 
+  filter(GCC_NAME16 != "Greater Sydney") %>% 
+  mutate(STATE_REGION = case_when(Y < -33.8688 ~ "SOUTH",
+                                  TRUE ~ "NORTH")) %>% 
+  select(SA2_CODE
+         ,STATE_REGION)
+
+write_csv(state_region, "../Data Files/ABS/State_North_South.csv")
