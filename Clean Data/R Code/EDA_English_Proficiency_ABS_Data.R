@@ -113,6 +113,8 @@ nsw_ep_data %>%
   ggtitle("English Proficiency vs Unemployment Rate") +
   ylim(c(0,0.17)) +
   theme(plot.title = element_text(face = "bold")) +
+  scale_x_continuous(labels = scales::percent) +
+  scale_y_continuous(labels = scales::percent) +
   theme_bw()
 
 # There may be a slight relationship
