@@ -35,7 +35,7 @@ nsw_data <- nsw_data %>%
 
 # What about the zero unemployment places
 nsw_data %>% 
-  filter(PERC_UNEMPLOYED == 0.0)
+  filter(PERC_UNEMPLOYED > 0.12)
 
 ## DATA DECISION - KEEP, for now
 
@@ -44,7 +44,11 @@ ggplot(nsw_data) +
 
 # What do the whole numbers look like
 ggplot(nsw_data) +
-  geom_histogram(aes(x = UNEMPLOYED), bins = 50)
+  geom_histogram(aes(x = UNEMPLOYED), bins = 50) +
+  ggtitle("Number of SA2's by Total Unemployed") +
+  xlab("Total unemployed") +
+  ylab("Count") +
+  theme_bw()
 
 #
 mean(nsw_data$PERC_UNEMPLOYED)
@@ -104,3 +108,13 @@ combined_df %>%
   summarise(TOTAL_UNEMPLOYED = sum(UNEMPLOYED),
             TOTAL_LAB_FORCE = sum(LAB_FORCE)) %>% 
   mutate(UNEMPLOYMENT_RATE = TOTAL_UNEMPLOYED / TOTAL_LAB_FORCE)
+
+
+state_region <- combined_df %>% 
+  filter(GCC_NAME16 != "Greater Sydney") %>% 
+  mutate(STATE_REGION = case_when(Y < -33.8688 ~ "SOUTH",
+                                  TRUE ~ "NORTH")) %>% 
+  select(SA2_CODE
+         ,STATE_REGION)
+
+write_csv(state_region, "../Data Files/ABS/State_North_South.csv")

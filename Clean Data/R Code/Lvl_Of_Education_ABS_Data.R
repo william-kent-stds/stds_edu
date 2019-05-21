@@ -14,13 +14,23 @@ clean_data <- raw_data %>%
   group_by(Education.Level, ASGS_2016) %>% 
   summarise(TOTAL = sum(obsValue)) %>% 
   spread(Education.Level, TOTAL) %>% 
-  mutate(EDU_CERTIFICATE = `Certificate I & II Level` + `Certificate III & IV Level` + `Certificate Level` + `Certificate Level, nfd`,
+  mutate(EDU_CERT_I_II = `Certificate I & II Level`,
+         EDU_CERT_III_IV = `Certificate III & IV Level`,
+         EDU_CERT = `Certificate Level` + `Certificate Level, nfd`,
+         EDU_CERT_ALL = `Certificate I & II Level` + `Certificate III & IV Level` + `Certificate Level` + `Certificate Level, nfd`,
+         EDU_GRAD_DIP_CERT = `Graduate Diploma and Graduate Certificate Level`,
+         EDU_POSTGRAD_DEGREE = `Postgraduate Degree Level`,
          EDU_POSTGRAD = `Graduate Diploma and Graduate Certificate Level` + `Postgraduate Degree Level`,
          EDU_OTHER = `Level of education inadequately described` + `Level of education not stated`) %>% 
   select(SA2_CODE = ASGS_2016
          ,EDU_DIPLOMA = `Advanced Diploma and Diploma Level`
          ,EDU_BACHELOR = `Bachelor Degree Level`
-         ,EDU_CERTIFICATE
+         ,EDU_CERT_I_II
+         ,EDU_CERT_III_IV
+         ,EDU_CERT
+         ,EDU_CERT_ALL
+         ,EDU_GRAD_DIP_CERT
+         ,EDU_POSTGRAD_DEGREE
          ,EDU_POSTGRAD
          ,EDU_OTHER)
 

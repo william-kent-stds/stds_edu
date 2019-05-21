@@ -4,6 +4,8 @@ library(corrplot)
 library(sf)
 library(viridis)
 library(Amelia)
+library(extrafont)
+library(xkcd)
 
 #getwd()
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -75,6 +77,8 @@ nsw_lah_data %>%
   ylab("Unemployment Rate (%)") +
   ylim(c(0,0.17)) +
   theme(plot.title = element_text(face = "bold")) +
+  scale_x_continuous(labels = scales::percent) +
+  scale_y_continuous(labels = scales::percent) +
   theme_bw()
 
 # There seems to be a slight relationship. The SA2's with the lowest % of people speaking English at home have the highest unemployment rates.
@@ -136,4 +140,35 @@ nsw_lah_data %>%
   stat_smooth(aes(x = PERC_LANG_HOME_ENGLISH, y = PERC_UNEMPLOYED), level = 0, colour = "#bb0300", size = 2) +
   theme_bw()
 
-?geom_hex
+vignette("xkcd-intro")
+
+nsw_lah_data %>% 
+  inner_join(employed_data, by = c("SA2_CODE")) %>% 
+  filter(PERC_UNEMPLOYED < 0.2) %>% 
+  ggplot() +
+  geom_point(aes(x = PERC_LANG_HOME_ENGLISH, y = PERC_UNEMPLOYED), colour = "grey20") +
+  geom_smooth(aes(x = PERC_LANG_HOME_ENGLISH, y = PERC_UNEMPLOYED)) +
+  ggtitle("Unemployment Rate vs Percent of English-Speaking Households") +
+  xkcdaxis(xrange = c(0,1), yrange = c(0,0.16)) +
+  theme(text = element_text(family = "xkcd"))
+
+vignette("xkcd-intro")
+if("xkcd" %in% fonts()) {
+  warning("I'm here")
+} else {
+  warning("I'm Not Here")
+}
+
+
+download.file("http://simonsoftware.se/other/xkcd.ttf", dest="xkcd.ttf", mode="wb")
+system("mkdir ~/.fonts")
+system("cp xkcd.ttf ~/.fonts")
+font_import(pattern = "[X/x]kcd", prompt=FALSE)
+fonts()
+> fonttable()
+> if(.Platform$OS.type != "unix") {
+  + ## Register fonts for Windows bitmap output
+    + loadfonts(device="win")
+  + } else {
+    + loadfonts()
+    + }
