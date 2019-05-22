@@ -15,7 +15,8 @@ raw_data %>%
 
 # Stage data format - Band English Proficiency
 working_data <- raw_data %>% 
-  filter(ENG_PROFICIENCY != "Total") %>% 
+  filter(ENG_PROFICIENCY != "Total",
+         AGE_BAND != "All ages") %>% 
   mutate(ENG_PROF_BAND = case_when(ENG_PROFICIENCY == "Speaks English only" ~ "ENG_ONLY",
                                    ENG_PROFICIENCY == "Speaks other language and speaks English: Very well" ~ "ENG_V_WELL",
                                    ENG_PROFICIENCY == "Speaks other language and speaks English: Well" ~ "ENG_WELL",
