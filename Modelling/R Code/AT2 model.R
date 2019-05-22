@@ -37,6 +37,14 @@ matrix <- model_data[, 3:47]
 as.matrix(matrix)
 corrplot(cor(matrix), method = "circle", type = "lower", order = "hclust")
 
+
+# Do a corrplot for marrital status variables left. It turns out that married and widowed are highly correlated with divorced/separated. 
+
+marital_matrix <- model_data[, 26:28]
+as.matrix(marital_matrix)
+corrplot(cor(marital_matrix), method = "circle", type = "lower")
+
+
 #### ------------------------------- MODEL 3 ----------------------------------- ####
 
 # Run a lasso over the dataset #
@@ -60,7 +68,7 @@ coef(cv.fit_lasso, s = cv.fit_lasso$lambda.1se)
 
 # Create a new logistic regression where 1 = unemployment rate < 0.05 and 0 = unemployment rate > 0.05
 
-model_data <- model_data %>% mutate(rate = (UNEMPLOYED)/(LAB_FORCE - UNEMPLOYED))
+model_data <- model_data %>% mutate(rate = (UNEMPLOYED)/(LAB_FORCE))
 
 # Set the boundary % to 2016 unemployment rate
 model_data <- model_data %>% mutate(binary = ifelse(model_data$rate > 0.057, 0, 1))
@@ -68,11 +76,18 @@ model_data <- model_data %>% mutate(binary = ifelse(model_data$rate > 0.057, 0, 
 model_data$binary <- as.factor(model_data$binary)
 
 model_3 <- glm(binary ~.-SA2_NAME -SA2_CODE -TOTAL_POP -LAB_FORCE -UNEMPLOYED 
-               -rate -binary, 
-               family = "binomial", 
+               -rate -binary -SEPARATED_MOD -DIVORCED_MOD -COMMUTE_TRAIN -COMMUTE_BUS
+               -COMMUTE_CAR -COMMUTE_WALK -COMMUTE_MOTORBIKE -COMMUTE_OTHER 
+               -COMMUTE_BIKE -COMMUTE_PUBLIC_TRANS -MARRIED_MOD - WIDOWED_MOD
+               -ARRIVAL_LAST_20 -ARRIVAL_20_50 -ARRIVAL_OVER_50,
+               family = binomial("logit"),
                data = model_data)
 
 summary(model_3)
 
 # find the count of 1's and 0's 
 table(model_data$binary)
+
+# ----------------------------- Adjust variables in model --------------------------- #
+
+model_data <- model_data %>% mutate(EDUCATION = sum()
