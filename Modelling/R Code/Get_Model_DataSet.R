@@ -55,7 +55,7 @@ model_data <- nsw_sa2 %>%
          DIVORCED_MOD = `Persons Total Divorced` * PERC_LAB_FORCE,
          MARRIED_MOD = `Persons Total Married` * PERC_LAB_FORCE,
          WIDOWED_MOD = `Persons Total Widowed` * PERC_LAB_FORCE,
-         DIVORCED_SEPARATED_MOD = (`Persons Total Separated` + `Persons Total Widowed`) * PERC_LAB_FORCE,
+         WIDOWED_DIVORCED_SEPARATED_MOD = (`Persons Total Separated` + `Persons Total Widowed` + `Persons Total Divorced`) * PERC_LAB_FORCE,
          MALES = males * PERC_LAB_FORCE,
          FEMALES = females * PERC_LAB_FORCE,
          ANCESTRY_BOTH_AUST = Both_Parents_Born_Australia * PERC_LAB_FORCE,
@@ -102,7 +102,7 @@ model_data <- nsw_sa2 %>%
          ,DIVORCED_MOD
          ,MARRIED_MOD
          ,WIDOWED_MOD
-         ,DIVORCED_SEPARATED_MOD
+         ,WIDOWED_DIVORCED_SEPARATED_MOD
          ,PERC_HHOLD_SIZE_OVER_5
          ,PERC_HHOLD_NON_FAM
          ,MALES
@@ -133,7 +133,7 @@ model_matrix <- model_data %>%
          ,EDU_CERTIFICATE_MOD,EDU_DIPLOMA_MOD,SEPARATED_MOD,DIVORCED_MOD,MARRIED_MOD,WIDOWED_MOD,PERC_HHOLD_SIZE_OVER_5
          ,PERC_HHOLD_NON_FAM,MALES,FEMALES,ANCESTRY_BOTH_AUST,ANCESTRY_ONE_OS,ANCESTRY_BOTH_OS,ARRIVAL_LAST_20,ARRIVAL_20_50
          ,ARRIVAL_OVER_50,INDIG_POP,PERC_OPEN_SPACE,COMMUTE_CAR,COMMUTE_MOTORBIKE,COMMUTE_TRAIN
-         ,COMMUTE_BIKE,COMMUTE_OTHER,COMMUTE_PUBLIC_TRANS,DIVORCED_SEPARATED_MOD) %>% 
+         ,COMMUTE_BIKE,COMMUTE_OTHER,COMMUTE_PUBLIC_TRANS,WIDOWED_DIVORCED_SEPARATED_MOD) %>% 
   as.matrix()
 
 rcorr(model_matrix, type = "pearson")
